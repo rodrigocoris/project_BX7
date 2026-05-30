@@ -22,6 +22,7 @@ export type Product = {
   stock: number
   minStock: number
   price: number
+  image?: string
   trend: 'Subiendo' | 'Estable' | 'Bajando'
 }
 

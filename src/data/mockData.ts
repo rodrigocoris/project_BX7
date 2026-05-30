@@ -6,7 +6,7 @@ export const demoCredentials = {
 }
 
 export const metrics = [
-  { label: 'Ventas del mes', value: '€48.320', delta: '+18.2%' },
+  { label: 'Ventas del mes', value: 'MX$48,320', delta: '+18.2%' },
   { label: 'Productos activos', value: '1.284', delta: '+43 nuevos' },
   { label: 'Proveedores', value: '86', delta: '12 evaluados' },
   { label: 'Stock crítico', value: '19', delta: 'Revisión urgente' },
@@ -20,11 +20,11 @@ export const suppliers: Supplier[] = [
 ]
 
 export const products: Product[] = [
-  { id: 1, name: 'Correa Pro Grip', sku: 'SP-1001', category: 'Bolsos', stock: 148, minStock: 60, price: 14.9, trend: 'Subiendo' },
-  { id: 2, name: 'Organizador Compact', sku: 'SP-1042', category: 'Interior', stock: 36, minStock: 50, price: 18.5, trend: 'Bajando' },
-  { id: 3, name: 'Set Travel Plus', sku: 'SP-1077', category: 'Viaje', stock: 210, minStock: 80, price: 32.0, trend: 'Estable' },
-  { id: 4, name: 'Hebilla Smart Lock', sku: 'SP-1112', category: 'Herrajes', stock: 19, minStock: 40, price: 6.8, trend: 'Bajando' },
-  { id: 5, name: 'Kit Premium Pack', sku: 'SP-1188', category: 'Premium', stock: 64, minStock: 50, price: 44.9, trend: 'Subiendo' },
+  { id: 1, name: 'Correa Pro Grip', sku: 'SP-1001', category: 'Bolsos', stock: 148, minStock: 60, price: 14.9, image: '', trend: 'Subiendo' },
+  { id: 2, name: 'Organizador Compact', sku: 'SP-1042', category: 'Interior', stock: 36, minStock: 50, price: 18.5, image: '', trend: 'Bajando' },
+  { id: 3, name: 'Set Travel Plus', sku: 'SP-1077', category: 'Viaje', stock: 210, minStock: 80, price: 32.0, image: '', trend: 'Estable' },
+  { id: 4, name: 'Hebilla Smart Lock', sku: 'SP-1112', category: 'Herrajes', stock: 19, minStock: 40, price: 6.8, image: '', trend: 'Bajando' },
+  { id: 5, name: 'Kit Premium Pack', sku: 'SP-1188', category: 'Premium', stock: 64, minStock: 50, price: 44.9, image: '', trend: 'Subiendo' },
 ]
 
 export const salesData: SalesPoint[] = [

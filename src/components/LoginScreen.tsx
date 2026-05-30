@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import type { FormEvent } from 'react'
-import { Bx7Brand } from './Bx7Brand'
 
 type LoginScreenProps = {
   onLogin: (email: string, password: string) => void
@@ -26,16 +25,7 @@ export function LoginScreen({ onLogin, error }: LoginScreenProps) {
           transition={{ duration: 0.6 }}
           className="brand-card"
         >
-          <Bx7Brand subtitle="ERP visual para inventario, compras y ventas" />
-          <h1>Diseño BX7 para controlar proveedores, stock y ventas.</h1>
-          <p>
-            Una interfaz oscura, rápida y de alto contraste pensada para equipos que trabajan con ritmo y necesitan una marca fuerte.
-          </p>
-          <div className="brand-features">
-            <span><ShieldCheck size={16} /> Acceso seguro BX7</span>
-            <span><Sparkles size={16} /> Experiencia premium</span>
-            <span><ArrowRight size={16} /> Preparado para crecer</span>
-          </div>
+          <img className="login-banner-image" src="/BANNER%200.jpg" alt="Banner BX7" />
         </motion.div>
       </div>
 

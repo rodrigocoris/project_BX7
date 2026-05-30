@@ -1,4 +1,4 @@
-import { BarChart3, Boxes, Building2, LogOut, Sparkles, UserCog } from 'lucide-react'
+import { BarChart3, Boxes, Building2, LogOut, Sparkles } from 'lucide-react'
 import type { SessionUser } from '../types'
 import { Bx7Brand } from './Bx7Brand'
 
@@ -18,14 +18,7 @@ export function Sidebar({ user, onLogout }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <Bx7Brand showText={false} compact />
-        <div className="sidebar-brand-copy">
-          <strong>BX7</strong>
-          <span>
-            <UserCog size={14} />
-            ERP admin
-          </span>
-        </div>
+        <Bx7Brand showText={false} compact className="sidebar-banner" />
       </div>
 
       <nav className="sidebar-nav">

@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2 } from 'lucide-react'
 import { LoginScreen } from './components/LoginScreen'
 import { MetricCard } from './components/MetricCard'
 import { Sidebar } from './components/Sidebar'
@@ -19,13 +19,46 @@ const demoUser: SessionUser = {
   role: 'Administrador general',
 }
 
+const metricVariants = ['sales', 'products', 'suppliers', 'stock'] as const
+
+type ProductDraft = {
+  name: string
+  sku: string
+  category: string
+  stock: string
+  minStock: string
+  price: string
+  image?: string
+  trend: Product['trend']
+}
+
+const productCategoryOptions = ['Accesorios', 'Repuestos', 'Packaging', 'Logística', 'Bolsos', 'Interior', 'Viaje', 'Herrajes', 'Premium']
+
+const defaultProductDraft: ProductDraft = {
+  name: '',
+  sku: '',
+  category: 'Accesorios',
+  stock: '',
+  minStock: '',
+  price: '',
+  image: '',
+  trend: 'Estable',
+}
+
 export default function App() {
+  const formatCurrencyMXN = (amount: number) =>
+    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount)
+
   const [user, setUser] = useState<SessionUser | null>(() => readStorage<SessionUser | null>(sessionKey, null))
   const [suppliers, setSuppliers] = useState<Supplier[]>(() => readStorage(suppliersKey, seedSuppliers))
   const [products, setProducts] = useState<Product[]>(() => readStorage(productsKey, seedProducts))
   const [loginError, setLoginError] = useState('')
   const [searchSupplier, setSearchSupplier] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
+  const [productView, setProductView] = useState<'list' | 'create'>('list')
+  const [productDraft, setProductDraft] = useState<ProductDraft>(defaultProductDraft)
+  const [showProductModal, setShowProductModal] = useState(false)
+  const [editingProductId, setEditingProductId] = useState<number | null>(null)
 
   useEffect(() => {
     writeStorage(sessionKey, user)
@@ -38,6 +71,27 @@ export default function App() {
   useEffect(() => {
     writeStorage(productsKey, products)
   }, [products])
+
+  // On first run, if example rim product not present, add a sample product that uses example image
+  useEffect(() => {
+    const hasRin = products.some((p) => p.sku === 'RIN-EX')
+    if (!hasRin) {
+      const sample: Product = {
+        id: products.reduce((highestId, product) => Math.max(highestId, product.id), 0) + 1,
+        name: 'Rin Offroad BX7 17"',
+        sku: 'RIN-EX',
+        category: 'Rines',
+        stock: 20,
+        minStock: 5,
+        price: 1820.0,
+        image: '/930.jpg',
+        trend: 'Subiendo',
+      }
+
+      setProducts((current) => [sample, ...current])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const stockAlerts = useMemo(
     () => products.filter((product) => product.stock <= product.minStock),
@@ -52,6 +106,14 @@ export default function App() {
   const filteredProducts = useMemo(
     () => products.filter((product) => product.name.toLowerCase().includes(searchProduct.toLowerCase())),
     [products, searchProduct],
+  )
+
+  const productStats = useMemo(
+    () => ({
+      total: products.length,
+      lowStock: products.filter((product) => product.stock <= product.minStock).length,
+    }),
+    [products],
   )
 
   function handleLogin(email: string, password: string) {
@@ -82,6 +144,108 @@ export default function App() {
     )
   }
 
+  function updateProductDraft(field: keyof ProductDraft, value: string) {
+    setProductDraft((current) => ({ ...current, [field]: value } as ProductDraft))
+  }
+
+  function resetProductDraft() {
+    setProductDraft(defaultProductDraft)
+  }
+
+  function handleCreateProduct(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const name = productDraft.name.trim()
+    const sku = productDraft.sku.trim()
+    const category = productDraft.category.trim()
+    const stock = Number.parseInt(productDraft.stock, 10)
+    const minStock = Number.parseInt(productDraft.minStock, 10)
+    const price = Number.parseFloat(productDraft.price)
+
+    if (!name || !sku || !category || Number.isNaN(stock) || Number.isNaN(minStock) || Number.isNaN(price)) {
+      return
+    }
+
+    if (editingProductId != null) {
+      // Update existing product
+      setProducts((current) =>
+        current.map((p) => (p.id === editingProductId ? { ...p, name, sku, category, stock, minStock, price, image: productDraft.image || '/930.jpg', trend: productDraft.trend } : p)),
+      )
+      setEditingProductId(null)
+    } else {
+      const nextProduct: Product = {
+        id: products.reduce((highestId, product) => Math.max(highestId, product.id), 0) + 1,
+        name,
+        sku,
+        category,
+        stock,
+        minStock,
+        price,
+        image: productDraft.image || '/930.jpg',
+        trend: productDraft.trend,
+      }
+
+      setProducts((current) => [nextProduct, ...current])
+    }
+
+    setSearchProduct('')
+    setProductView('list')
+    setShowProductModal(false)
+    resetProductDraft()
+  }
+
+  function handleEditProduct(id: number) {
+    const prod = products.find((p) => p.id === id)
+    if (!prod) return
+    setProductDraft({
+      name: prod.name,
+      sku: prod.sku,
+      category: prod.category,
+      stock: String(prod.stock),
+      minStock: String(prod.minStock),
+      price: String(prod.price),
+      image: prod.image || '',
+      trend: prod.trend,
+    })
+    setEditingProductId(id)
+    setShowProductModal(true)
+  }
+
+  function handleDuplicateProduct(id: number) {
+    const prod = products.find((p) => p.id === id)
+    if (!prod) return
+    const copy: Product = {
+      id: products.reduce((highestId, product) => Math.max(highestId, product.id), 0) + 1,
+      name: prod.name + ' (copia)',
+      sku: prod.sku + '-C',
+      category: prod.category,
+      stock: prod.stock,
+      minStock: prod.minStock,
+      price: prod.price,
+      image: prod.image || '/930.jpg',
+      trend: prod.trend,
+    }
+    setProducts((current) => [copy, ...current])
+  }
+
+  function handleDeleteProduct(id: number) {
+    const toDelete = products.find((p) => p.id === id)
+    if (!toDelete) return
+    const ok = window.confirm(`Eliminar ${toDelete.name}? Esta acción no se puede deshacer.`)
+    if (!ok) return
+    setProducts((current) => current.filter((p) => p.id !== id))
+  }
+
+  function getSupplierStatusClass(status: Supplier['status']) {
+    if (status === 'Activo') return 'status-select status-active'
+    if (status === 'En revisión') return 'status-select status-review'
+    return 'status-select status-critical'
+  }
+
+  function getProductRowClass(product: Product) {
+    return product.stock <= product.minStock ? 'stock-critical' : ''
+  }
+
   if (!user) {
     return <LoginScreen onLogin={handleLogin} error={loginError} />
   }
@@ -91,33 +255,48 @@ export default function App() {
       <Sidebar user={user} onLogout={handleLogout} />
 
       <main className="dashboard">
+        <section className="panel dashboard-banner" id="resumen">
+          <img className="dashboard-banner-image" src="/BANNER%200.jpg" alt="Banner BX7" />
+        </section>
+
         <section className="hero-card" id="resumen">
-          <div>
-            <p className="eyebrow">BX7 ERP</p>
-            <h1>Controla inventario, proveedores y demanda desde un solo panel.</h1>
-            <p>
-              Una base sólida para operar compras, ventas y planificación con una experiencia visual moderna y rápida.
-            </p>
-          </div>
           <div className="hero-stats">
-            <div>
+            <article className="metric-card metric-card--small metric-card--sales">
+              <div className="metric-icon" aria-hidden="true">
+                <ShieldCheck size={18} />
+              </div>
               <span>Capacidad operativa</span>
               <strong>98%</strong>
-            </div>
-            <div>
+            </article>
+
+            <article className="metric-card metric-card--small metric-card--stock">
+              <div className="metric-icon" aria-hidden="true">
+                <AlertTriangle size={18} />
+              </div>
               <span>Riesgo de rotura</span>
               <strong>Moderado</strong>
-            </div>
-            <div>
+            </article>
+
+            <article className="metric-card metric-card--small metric-card--products">
+              <div className="metric-icon" aria-hidden="true">
+                <CalendarDays size={18} />
+              </div>
               <span>Tiempo medio pedido</span>
               <strong>1.8 días</strong>
-            </div>
+            </article>
           </div>
         </section>
 
         <section className="metrics-grid">
           {metrics.map((metric, index) => (
-            <MetricCard key={metric.label} index={index} label={metric.label} value={metric.value} delta={metric.delta} />
+            <MetricCard
+              key={metric.label}
+              index={index}
+              label={metric.label}
+              value={metric.value}
+              delta={metric.delta}
+              variant={metricVariants[index]}
+            />
           ))}
         </section>
 
@@ -195,7 +374,7 @@ export default function App() {
           </motion.article>
         </section>
 
-        <section className="content-grid two-cols" id="proveedores">
+        <section className="content-stack" id="proveedores">
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <div className="panel-head">
               <div>
@@ -224,7 +403,11 @@ export default function App() {
                       </td>
                       <td>{supplier.category}</td>
                       <td>
-                        <select value={supplier.status} onChange={(event) => updateSupplierStatus(supplier.id, event.target.value as Supplier['status'])}>
+                        <select
+                          className={getSupplierStatusClass(supplier.status)}
+                          value={supplier.status}
+                          onChange={(event) => updateSupplierStatus(supplier.id, event.target.value as Supplier['status'])}
+                        >
                           <option value="Activo">Activo</option>
                           <option value="En revisión">En revisión</option>
                           <option value="Crítico">Crítico</option>
@@ -237,51 +420,289 @@ export default function App() {
               </table>
             </div>
           </motion.article>
-
-          <motion.article className="panel" id="productos" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
-            <div className="panel-head">
-              <div>
-                <p className="eyebrow">BX7 inventario</p>
-                <h2>Productos y rotación BX7</h2>
-              </div>
-              <input value={searchProduct} onChange={(event) => setSearchProduct(event.target.value)} placeholder="Buscar producto" />
-            </div>
-
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Producto</th>
-                    <th>Stock</th>
-                    <th>Precio</th>
-                    <th>Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredProducts.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <strong>{product.name}</strong>
-                        <span>{product.sku} · {product.category}</span>
-                      </td>
-                      <td>
-                        <strong>{product.stock}</strong>
-                        <span>Mín. {product.minStock}</span>
-                      </td>
-                      <td>€{product.price.toFixed(2)}</td>
-                      <td>
-                        <button type="button" className="ghost-button" onClick={() => restockProduct(product.id)}>
-                          Reponer
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.article>
         </section>
 
+        <section className="content-stack" id="productos">
+          <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            {productView === 'list' ? (
+              <div className="product-list-view">
+                <div className="products-header">
+                  <div className="products-stats">
+                    <div className="product-stat">
+                      <span className="stat-label">Productos</span>
+                      <strong className="stat-value">{productStats.total}</strong>
+                    </div>
+
+                    <div className="product-stat">
+                      <span className="stat-label">Bajo stock</span>
+                      <strong className="stat-value">{productStats.lowStock}</strong>
+                    </div>
+
+                    <div className="product-stat">
+                      <span className="stat-label">Resultados</span>
+                      <strong className="stat-value">{filteredProducts.length}</strong>
+                    </div>
+                  </div>
+
+                  <div className="products-actions">
+                    <div className="products-tabs">
+                      <button className={`tab-button ${productView === 'list' ? 'tab-button--active' : ''}`} onClick={() => setProductView('list')}>Lista</button>
+                      <button className={`tab-button ${productView === 'create' ? 'tab-button--active' : ''}`} onClick={() => setProductView('create')}>Alta rápida</button>
+                    </div>
+
+                    <button type="button" className="primary-button add-product-button" onClick={() => setShowProductModal(true)}>
+                      Agregar producto
+                    </button>
+                  </div>
+                </div>
+
+                {showProductModal && (
+                  <div className="modal-backdrop" onClick={() => setShowProductModal(false)}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                      <form className="product-form" onSubmit={handleCreateProduct}>
+                        <div className="product-form-headline">
+                          <strong>Alta rápida</strong>
+                          <span>Formulario corto y directo para registrar un producto sin saturar la vista.</span>
+                        </div>
+
+                        <div className="form-grid">
+                          <label>
+                            Nombre
+                            <input value={productDraft.name} onChange={(event) => updateProductDraft('name', event.target.value)} placeholder="Nombre del producto" required />
+                          </label>
+
+                          <label>
+                            SKU
+                            <input value={productDraft.sku} onChange={(event) => updateProductDraft('sku', event.target.value)} placeholder="SP-2001" required />
+                          </label>
+
+                          <label>
+                            Categoría
+                            <select value={productDraft.category} onChange={(event) => updateProductDraft('category', event.target.value)}>
+                              {productCategoryOptions.map((category) => (
+                                <option key={category} value={category}>
+                                  {category}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+
+                          <label>
+                            Estado de rotación
+                            <select value={productDraft.trend} onChange={(event) => updateProductDraft('trend', event.target.value)}>
+                              <option value="Subiendo">Subiendo</option>
+                              <option value="Estable">Estable</option>
+                              <option value="Bajando">Bajando</option>
+                            </select>
+                          </label>
+
+                          <label>
+                            Stock inicial
+                            <input value={productDraft.stock} onChange={(event) => updateProductDraft('stock', event.target.value)} type="number" min="0" placeholder="0" required />
+                          </label>
+
+                          <label>
+                            Stock mínimo
+                            <input value={productDraft.minStock} onChange={(event) => updateProductDraft('minStock', event.target.value)} type="number" min="0" placeholder="20" required />
+                          </label>
+
+                          <label>
+                            Precio
+                            <input value={productDraft.price} onChange={(event) => updateProductDraft('price', event.target.value)} type="number" min="0" step="0.01" placeholder="19.90" required />
+                          </label>
+
+                          <label>
+                            Imagen (URL o subir)
+                            <input
+                              type="text"
+                              value={productDraft.image || ''}
+                              onChange={(e) => updateProductDraft('image', e.target.value)}
+                              placeholder="https://... o dejar vacío para usar imagen ejemplo"
+                            />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (!file) return
+                                const reader = new FileReader()
+                                reader.onload = () => {
+                                  updateProductDraft('image', String(reader.result))
+                                }
+                                reader.readAsDataURL(file)
+                              }}
+                            />
+                            <button type="button" className="ghost-button" onClick={() => updateProductDraft('image', '/930.jpg')}>Usar imagen de ejemplo</button>
+                          </label>
+                        </div>
+
+                        <div className="form-actions">
+                          <button type="submit" className="primary-button">{editingProductId ? 'Guardar cambios' : 'Guardar producto'}</button>
+                          <button type="button" className="ghost-button" onClick={() => { resetProductDraft(); setShowProductModal(false); setEditingProductId(null); }}>Cancelar</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Producto</th>
+                        <th>Stock</th>
+                        <th>Precio</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map((product) => (
+                        <tr key={product.id} className={getProductRowClass(product)}>
+                          <td>
+                            <div style={{display: 'flex', gap: 12, alignItems: 'center'}}>
+                              <img src={product.image || '/930.jpg'} alt={product.name} className="product-thumb" />
+                              <div>
+                                <strong>{product.name}</strong>
+                                <span>{product.sku} · {product.category}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <strong>{product.stock}</strong>
+                            <span>Mín. {product.minStock}</span>
+                          </td>
+                          <td>{formatCurrencyMXN(product.price)}</td>
+                          <td>
+                            <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
+                              <button type="button" className="icon-button" title="Editar" onClick={() => handleEditProduct(product.id)}>
+                                <Edit2 size={16} />
+                              </button>
+
+                              <button type="button" className="icon-button" title="Duplicar" onClick={() => handleDuplicateProduct(product.id)}>
+                                <Copy size={16} />
+                              </button>
+
+                              <button type="button" className="icon-button" title="Eliminar" onClick={() => handleDeleteProduct(product.id)}>
+                                <Trash2 size={16} />
+                              </button>
+
+                              <button type="button" className="ghost-button" onClick={() => restockProduct(product.id)}>
+                                Reponer
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="product-form-layout">
+                <form className="product-form" onSubmit={handleCreateProduct}>
+                  <div className="product-form-headline">
+                    <strong>Alta rápida</strong>
+                    <span>Formulario corto y directo para registrar un producto sin saturar la vista.</span>
+                  </div>
+
+                  <div className="form-grid">
+                    <label>
+                      Nombre
+                      <input value={productDraft.name} onChange={(event) => updateProductDraft('name', event.target.value)} placeholder="Nombre del producto" required />
+                    </label>
+
+                    <label>
+                      SKU
+                      <input value={productDraft.sku} onChange={(event) => updateProductDraft('sku', event.target.value)} placeholder="SP-2001" required />
+                    </label>
+
+                    <label>
+                      Categoría
+                      <select value={productDraft.category} onChange={(event) => updateProductDraft('category', event.target.value)}>
+                        {productCategoryOptions.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      Estado de rotación
+                      <select value={productDraft.trend} onChange={(event) => updateProductDraft('trend', event.target.value)}>
+                        <option value="Subiendo">Subiendo</option>
+                        <option value="Estable">Estable</option>
+                        <option value="Bajando">Bajando</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Stock inicial
+                      <input value={productDraft.stock} onChange={(event) => updateProductDraft('stock', event.target.value)} type="number" min="0" placeholder="0" required />
+                    </label>
+
+                    <label>
+                      Stock mínimo
+                      <input value={productDraft.minStock} onChange={(event) => updateProductDraft('minStock', event.target.value)} type="number" min="0" placeholder="20" required />
+                    </label>
+
+                    <label>
+                      Precio
+                      <input value={productDraft.price} onChange={(event) => updateProductDraft('price', event.target.value)} type="number" min="0" step="0.01" placeholder="19.90" required />
+                    </label>
+                  </div>
+
+                  <div className="form-actions">
+                    <button type="submit" className="primary-button">
+                      Guardar producto
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost-button"
+                      onClick={() => {
+                        resetProductDraft()
+                        setProductView('list')
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+
+                <aside className="product-preview-card">
+                  <p className="eyebrow">Vista rápida</p>
+                  {productDraft.image ? (
+                    <img src={productDraft.image} alt={productDraft.name || 'Preview'} style={{width: '100%', borderRadius: 8, marginBottom: 8, objectFit: 'cover'}} />
+                  ) : null}
+                  <strong>{productDraft.name || 'Nuevo producto'}</strong>
+                  <span>{productDraft.sku || 'SKU pendiente'}</span>
+
+                    <div className="preview-grid">
+                    <div>
+                      <span>Categoría</span>
+                      <strong>{productDraft.category}</strong>
+                    </div>
+                    <div>
+                      <span>Rotación</span>
+                      <strong>{productDraft.trend}</strong>
+                    </div>
+                    <div>
+                      <span>Stock</span>
+                      <strong>{productDraft.stock || '0'}</strong>
+                    </div>
+                    <div>
+                      <span>Precio</span>
+                      <strong>{productDraft.price ? formatCurrencyMXN(Number(productDraft.price)) : formatCurrencyMXN(0)}</strong>
+                    </div>
+                  </div>
+
+                  <p>La idea es registrar rápido y seguir viendo la lista sin cambiar de pantalla demasiado.</p>
+                </aside>
+              </div>
+            )}
+          </motion.article>
+        </section>
+        
         <section className="content-grid two-cols" id="predicciones">
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <div className="panel-head">
@@ -336,7 +757,7 @@ export default function App() {
               </div>
               <div>
                 <Coins size={16} />
-                Facturación estimada €128k
+                Facturación estimada {formatCurrencyMXN(128000)}
               </div>
               <div>
                 <Truck size={16} />

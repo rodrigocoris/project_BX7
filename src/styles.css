@@ -9,6 +9,8 @@
   --muted: #c1c1c1;
   --accent: #ff5a1f;
   --accent-strong: #ffb000;
+  --brand-grad-start: var(--accent);
+  --brand-grad-end: var(--accent-strong);
   --warning: #ffb000;
   --danger: #ff4d43;
   --shadow: 0 30px 70px rgba(0, 0, 0, 0.48);
@@ -92,19 +94,6 @@ a {
   min-height: 100%;
 }
 
-.login-visual h1,
-.hero-card h1 {
-  font-size: clamp(2.5rem, 5vw, 5rem);
-  line-height: 0.96;
-  margin: 14px 0 18px;
-}
-
-.hero-copy {
-  display: grid;
-  gap: 12px;
-  max-width: 760px;
-}
-
 .login-visual p,
 .hero-card p,
 .login-copy,
@@ -120,17 +109,21 @@ a {
 
 .glow {
   position: absolute;
-  border-radius: 999px;
-  filter: blur(12px);
-  opacity: 0.95;
-  animation: float 11s ease-in-out infinite;
+.hero-stats .metric-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 90, 31, 0.18), rgba(255,176,0,0.12));
+  color: #ffd166;
+  border: 1px solid rgba(255,176,0,0.12);
 }
-
-.glow-one {
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 90, 31, 0.22);
-  top: -30px;
+.hero-stats .metric-icon svg {
+  width: 28px;
+  height: 28px;
+}
   right: 12%;
 }
 
@@ -151,6 +144,32 @@ a {
   gap: 18px;
 }
 
+.login-banner-image {
+  width: min(100%, 760px);
+  display: block;
+  border-radius: 24px;
+  object-fit: contain;
+}
+
+.login-banner-image {
+  width: 100%;
+  height: auto;
+}
+
+.sidebar-banner {
+  width: 100%;
+}
+
+.sidebar-banner .bx7-brand__mark {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.sidebar-banner .bx7-brand__text {
+  display: none;
+}
+
 .bx7-brand {
   display: inline-flex;
   align-items: center;
@@ -159,7 +178,7 @@ a {
 }
 
 .bx7-brand--compact .bx7-brand__mark {
-  width: 132px;
+  width: 100%;
 }
 
 .bx7-brand--compact .bx7-brand__text strong {
@@ -177,6 +196,52 @@ a {
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.36);
+
+  /* Apply brand gradient to the mark */
+  background: linear-gradient(135deg, var(--brand-grad-start), var(--brand-grad-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Subtle brand accent for hero card (top-left glow) */
+.hero-card {
+  position: relative;
+}
+
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: -24px;
+  width: 260px;
+  height: 140px;
+  border-radius: 20px;
+  background: radial-gradient(circle at 20% 20%, rgba(255,90,31,0.12), rgba(255,176,0,0.08) 40%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Thin brand bar at top of page */
+:root {
+  --brand-bar-height: 6px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--brand-bar-height);
+  background: linear-gradient(90deg, var(--brand-grad-start), var(--brand-grad-end));
+  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* ensure content isn't covered by the bar */
+body {
+  padding-top: var(--brand-bar-height);
 }
 
 .bx7-brand__mark svg {
@@ -274,11 +339,43 @@ table select {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   padding: 14px 16px;
+  color-scheme: dark;
+}
+
+.panel select option,
+table select option {
+  background: #111111;
+  color: var(--text);
 }
 
 .login-card input::placeholder,
 .panel input::placeholder {
   color: rgba(214, 225, 248, 0.45);
+}
+
+.status-select {
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.12) !important;
+  border-color: rgba(34, 197, 94, 0.35) !important;
+  color: #b9ffd0 !important;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.12);
+}
+
+.status-review {
+  background: rgba(255, 176, 0, 0.14) !important;
+  border-color: rgba(255, 176, 0, 0.34) !important;
+  color: #ffe1a1 !important;
+  box-shadow: 0 0 0 1px rgba(255, 176, 0, 0.12);
+}
+
+.status-critical {
+  background: rgba(255, 77, 67, 0.14) !important;
+  border-color: rgba(255, 77, 67, 0.36) !important;
+  color: #ffc1bc !important;
+  box-shadow: 0 0 0 1px rgba(255, 77, 67, 0.12);
 }
 
 .login-error {
@@ -424,19 +521,37 @@ table select {
 .hero-card {
   padding: 28px;
   display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: flex-end;
-}
-
-.hero-card p {
-  max-width: 60ch;
+  justify-content: center;
+  align-items: stretch;
 }
 
 .hero-stats {
+  width: 100%;
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  min-width: 250px;
+}
+
+/* Make small metric cards that match the style of the metric cards below */
+.metric-card--small {
+  padding: 12px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 96px;
+}
+
+.hero-stats .metric-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 90, 31, 0.18), rgba(255,176,0,0.12));
+  color: #ffd166;
+  border: 1px solid rgba(255,176,0,0.12);
 }
 
 .hero-stats div,
@@ -458,6 +573,46 @@ table select {
   padding: 22px;
   flex: 1 1 0;
   min-width: 0;
+}
+  .dashboard-banner-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 24px;
+    object-fit: contain;
+  }
+
+.metric-card--sales .metric-icon {
+  background: linear-gradient(135deg, rgba(255, 90, 31, 0.28), rgba(255, 176, 0, 0.26));
+  color: #ffcc66;
+}
+
+.metric-card--products .metric-icon {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.22), rgba(34, 197, 94, 0.24));
+  color: #7dff9d;
+}
+
+.metric-card--suppliers .metric-icon {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(99, 102, 241, 0.26));
+  color: #8db6ff;
+}
+
+.metric-card--stock .metric-icon {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.24), rgba(255, 90, 31, 0.26));
+  color: #ff7a7a;
+}
+
+.metric-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(255, 90, 31, 0.18), rgba(255, 176, 0, 0.2));
+  color: #ffd166;
+  border: 1px solid rgba(255, 176, 0, 0.18);
 }
 
 .metric-card span,
@@ -481,8 +636,9 @@ table select {
   grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
 }
 
-.two-cols {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.content-stack {
+  display: grid;
+  gap: 18px;
 }
 
 .panel {
@@ -496,6 +652,208 @@ table select {
   gap: 18px;
   margin-bottom: 18px;
 }
+
+.products-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.products-stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.product-stat {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-stat .stat-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.product-stat .stat-value {
+  font-size: 1.1rem;
+}
+
+.products-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.add-product-button {
+  padding: 12px 20px;
+  border-radius: 14px;
+}
+
+.products-tabs .tab-button {
+  padding: 8px 10px;
+}
+
+@media (max-width: 720px) {
+  .products-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .products-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.products-tabs {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.tab-button {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+}
+
+.tab-button--active {
+  background: linear-gradient(135deg, rgba(255,90,31,0.12), rgba(255,176,0,0.08));
+  border-color: rgba(255,176,0,0.18);
+}
+
+.product-list-view .products-summary {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.product-form-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 18px;
+}
+
+/* Modal styles for product form */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+.modal {
+  background: var(--card-strong);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 18px;
+  width: min(920px, 96%);
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: var(--shadow);
+}
+
+.modal .product-form {
+  display: grid;
+  gap: 12px;
+}
+
+.product-form .product-form-headline {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.product-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.form-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.product-preview-card {
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.02);
+}
+
+.product-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  border-color: var(--border);
+  background: rgba(255,255,255,0.04);
+  transform: translateY(-1px);
+}
+
+.icon-button svg {
+  display: block;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+@media (max-width: 920px) {
+  .product-form-layout {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 
 .eyebrow {
   color: #ffb000;
@@ -550,6 +908,21 @@ table select {
   gap: 14px;
 }
 
+.alert-item {
+  border-color: rgba(255, 77, 67, 0.22);
+  background: linear-gradient(135deg, rgba(255, 77, 67, 0.1), rgba(255, 90, 31, 0.05));
+}
+
+.forecast-item {
+  border-color: rgba(255, 176, 0, 0.18);
+  background: linear-gradient(135deg, rgba(255, 176, 0, 0.1), rgba(255, 255, 255, 0.02));
+}
+
+.activity-item {
+  border-color: rgba(59, 130, 246, 0.18);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(255, 255, 255, 0.03));
+}
+
 .quick-stats,
 .inventory-summary {
   display: grid;
@@ -598,7 +971,7 @@ tbody tr:hover {
 
   .metrics-grid,
   .content-grid,
-  .two-cols,
+  .content-stack,
   .login-shell {
     grid-template-columns: 1fr;
     flex-direction: column;
@@ -635,6 +1008,10 @@ tbody tr:hover {
     align-items: flex-start;
   }
 
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+
   .bx7-brand {
     align-items: flex-start;
     flex-direction: column;
@@ -649,7 +1026,16 @@ tbody tr:hover {
     flex-direction: column;
   }
 }
-  .metrics-grid {
-    grid-template-columns: 1fr;
-  }
+
+/* Ensure hero stat icons stay larger than default metric-icon (override later rules) */
+.hero-stats .metric-icon {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 14px !important;
+  margin-bottom: 0 !important;
+}
+
+.hero-stats .metric-icon svg {
+  width: 28px !important;
+  height: 28px !important;
 }
