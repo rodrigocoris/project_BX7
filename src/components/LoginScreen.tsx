@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import type { FormEvent } from 'react'
+import { Bx7Brand } from './Bx7Brand'
 
 type LoginScreenProps = {
   onLogin: (email: string, password: string) => void
@@ -25,7 +26,10 @@ export function LoginScreen({ onLogin, error }: LoginScreenProps) {
           transition={{ duration: 0.6 }}
           className="brand-card"
         >
-          <img className="login-banner-image" src="/BANNER%200.jpg" alt="Banner BX7" />
+          <Bx7Brand compact subtitle="Acceso privado para administración" />
+          <p className="login-copy login-copy--emphasis">
+            Gestiona inventario, pedidos y productos off-road desde un solo panel.
+          </p>
         </motion.div>
       </div>
 
