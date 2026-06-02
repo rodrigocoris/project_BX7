@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2 } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2, BarChart3, Boxes, Building2, User, ShieldPlus, CircleHelp } from 'lucide-react'
 import { LoginScreen } from './components/LoginScreen'
 import { MetricCard } from './components/MetricCard'
 import { Sidebar } from './components/Sidebar'
@@ -20,6 +20,13 @@ const demoUser: SessionUser = {
 }
 
 const metricVariants = ['sales', 'products', 'suppliers', 'stock'] as const
+
+const topNavigation = [
+  { label: 'Inicio', href: '#resumen', icon: BarChart3 },
+  { label: 'productos', href: '#productos', icon: Boxes },
+  { label: 'informacion', href: '#informacion', icon: Building2 },
+  { label: 'soporte', href: '#soporte', icon: CircleHelp },
+] as const
 
 type ProductDraft = {
   name: string
@@ -45,13 +52,28 @@ const defaultProductDraft: ProductDraft = {
   trend: 'Estable',
 }
 
+function normalizeProducts(list: Product[]) {
+  const seenIds = new Set<number>()
+  const seenSkus = new Set<string>()
+
+  return list.filter((product) => {
+    if (seenIds.has(product.id) || seenSkus.has(product.sku)) {
+      return false
+    }
+
+    seenIds.add(product.id)
+    seenSkus.add(product.sku)
+    return true
+  })
+}
+
 export default function App() {
   const formatCurrencyMXN = (amount: number) =>
     new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount)
 
   const [user, setUser] = useState<SessionUser | null>(() => readStorage<SessionUser | null>(sessionKey, null))
   const [suppliers, setSuppliers] = useState<Supplier[]>(() => readStorage(suppliersKey, seedSuppliers))
-  const [products, setProducts] = useState<Product[]>(() => readStorage(productsKey, seedProducts))
+  const [products, setProducts] = useState<Product[]>(() => normalizeProducts(readStorage(productsKey, seedProducts)))
   const [loginError, setLoginError] = useState('')
   const [searchSupplier, setSearchSupplier] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
@@ -255,8 +277,89 @@ export default function App() {
       <Sidebar user={user} onLogout={handleLogout} />
 
       <main className="dashboard">
+        <nav className="top-nav" aria-label="Navegación principal">
+          <div className="top-nav__brand">
+            <span className="top-nav__brand-pill">BX7 ERP</span>
+            <span className="top-nav__brand-copy">Panel operativo</span>
+          </div>
+
+          <div className="top-nav__links">
+            {topNavigation.map((item) => {
+              const Icon = item.icon
+              return (
+                <a key={item.href} href={item.href} className="top-nav__link">
+                  <Icon size={15} />
+                  {item.label}
+                </a>
+              )
+            })}
+          </div>
+
+          <div className="top-nav__user">
+            <div className="top-nav__user-icon" aria-hidden="true">
+              <User size={16} />
+            </div>
+            <div className="top-nav__user-copy">
+              <strong>{user.name}</strong>
+              <span>{user.role}</span>
+            </div>
+          </div>
+        </nav>
+
         <section className="panel dashboard-banner" id="resumen">
           <img className="dashboard-banner-image" src="/BANNER%200.jpg" alt="Banner BX7" />
+        </section>
+
+        <section className="content-grid two-cols" id="informacion">
+          <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7 información</p>
+                <h2>Resumen operativo BX7</h2>
+              </div>
+              <Building2 size={18} />
+            </div>
+
+            <p className="panel-copy">
+              Controla inventario, pedidos, proveedores y rines off-road desde un solo panel diseñado para operación diaria.
+            </p>
+
+            <div className="quick-stats">
+              <div>
+                <ShieldCheck size={16} />
+                Inventario y trazabilidad
+              </div>
+              <div>
+                <BarChart3 size={16} />
+                Métricas clave en tiempo real
+              </div>
+            </div>
+          </motion.article>
+
+          <motion.article className="panel" id="soporte" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7 soporte</p>
+                <h2>Ayuda y contacto</h2>
+              </div>
+              <CircleHelp size={18} />
+            </div>
+
+            <p className="panel-copy">
+              Si necesitas ayuda operativa o soporte técnico, este espacio queda listo para centralizar solicitudes y seguimiento.
+            </p>
+
+            <div className="quick-stats">
+              <div>
+                <User size={16} />
+                {user.name} · {user.role}
+              </div>
+              <div>
+                <ShieldPlus size={16} />
+                Acceso administrativo activo
+              </div>
+            </div>
+          </motion.article>
         </section>
 
         <section className="hero-card" id="resumen">
@@ -446,8 +549,8 @@ export default function App() {
 
                   <div className="products-actions">
                     <div className="products-tabs">
-                      <button className={`tab-button ${productView === 'list' ? 'tab-button--active' : ''}`} onClick={() => setProductView('list')}>Lista</button>
-                      <button className={`tab-button ${productView === 'create' ? 'tab-button--active' : ''}`} onClick={() => setProductView('create')}>Alta rápida</button>
+                      <button type="button" className="tab-button tab-button--active" onClick={() => setProductView('list')}>Lista</button>
+                      <button type="button" className="tab-button" onClick={() => setProductView('create')}>Alta rápida</button>
                     </div>
 
                     <button type="button" className="primary-button add-product-button" onClick={() => setShowProductModal(true)}>

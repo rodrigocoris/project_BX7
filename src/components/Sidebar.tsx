@@ -1,4 +1,4 @@
-import { BarChart3, Boxes, Building2, LogOut, Sparkles } from 'lucide-react'
+import { BarChart3, Boxes, Building2, LogOut, ShieldPlus, Sparkles } from 'lucide-react'
 import type { SessionUser } from '../types'
 import { Bx7Brand } from './Bx7Brand'
 
@@ -34,9 +34,12 @@ export function Sidebar({ user, onLogout }: SidebarProps) {
       </nav>
 
       <div className="sidebar-footer">
-        <div>
-          <strong>{user.name}</strong>
-          <span>{user.role}</span>
+        <div className="sidebar-user">
+          <div>
+            <strong>{user.name}</strong>
+            <span>{user.role}</span>
+          </div>
+          <ShieldPlus size={18} aria-hidden="true" />
         </div>
         <button type="button" className="logout-button" onClick={onLogout}>
           <LogOut size={16} />
