@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2, BarChart3, Boxes, Building2, User, ShieldPlus, CircleHelp } from 'lucide-react'
+import { ChevronDown, Search } from 'lucide-react'
 import { LoginScreen } from './components/LoginScreen'
 import { MetricCard } from './components/MetricCard'
 import { Sidebar } from './components/Sidebar'
@@ -26,6 +27,11 @@ const topNavigation = [
   { label: 'productos', href: '#productos', icon: Boxes },
   { label: 'informacion', href: '#informacion', icon: Building2 },
   { label: 'soporte', href: '#soporte', icon: CircleHelp },
+] as const
+
+const bx7GroupNavigation = [
+  { label: 'BX7 Wheels', href: '/bx7-wheels.html', description: 'Rines y soluciones para 4x4' },
+  { label: 'Teix', href: '#teix', description: 'Accesorios y componentes de marca' },
 ] as const
 
 type ProductDraft = {
@@ -77,6 +83,8 @@ export default function App() {
   const [loginError, setLoginError] = useState('')
   const [searchSupplier, setSearchSupplier] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
+  const [navSearch, setNavSearch] = useState('')
+  const [bx7GroupOpen, setBx7GroupOpen] = useState(false)
   const [productView, setProductView] = useState<'list' | 'create'>('list')
   const [productDraft, setProductDraft] = useState<ProductDraft>(defaultProductDraft)
   const [showProductModal, setShowProductModal] = useState(false)
@@ -137,6 +145,31 @@ export default function App() {
     }),
     [products],
   )
+
+  const filteredTopNavigation = useMemo(() => {
+    const query = navSearch.trim().toLowerCase()
+
+    if (!query) {
+      return topNavigation
+    }
+
+    return topNavigation.filter((item) => item.label.toLowerCase().includes(query))
+  }, [navSearch])
+
+  const filteredBx7GroupNavigation = useMemo(() => {
+    const query = navSearch.trim().toLowerCase()
+
+    if (!query) {
+      return bx7GroupNavigation
+    }
+
+    return bx7GroupNavigation.filter((item) => item.label.toLowerCase().includes(query) || item.description.toLowerCase().includes(query))
+  }, [navSearch])
+
+  const shouldShowBx7Group =
+    navSearch.trim().length === 0 ||
+    'bx7group'.includes(navSearch.trim().toLowerCase()) ||
+    filteredBx7GroupNavigation.length > 0
 
   function handleLogin(email: string, password: string) {
     const validLogin = email.toLowerCase() === demoCredentials.email && password === demoCredentials.password
@@ -280,19 +313,92 @@ export default function App() {
         <nav className="top-nav" aria-label="Navegación principal">
           <div className="top-nav__brand">
             <span className="top-nav__brand-pill">BX7 ERP</span>
-            <span className="top-nav__brand-copy">Panel operativo</span>
+          </div>
+
+          <div className="top-nav__search">
+            <Search size={15} />
+            <input
+              type="search"
+              value={navSearch}
+              onChange={(event) => {
+                setNavSearch(event.target.value)
+                setBx7GroupOpen(true)
+              }}
+              placeholder="Buscar opciones"
+              aria-label="Buscar opciones de navegación"
+            />
           </div>
 
           <div className="top-nav__links">
-            {topNavigation.map((item) => {
-              const Icon = item.icon
-              return (
-                <a key={item.href} href={item.href} className="top-nav__link">
-                  <Icon size={15} />
-                  {item.label}
-                </a>
-              )
-            })}
+            {/* Mostrar Inicio junto a BX7Group */}
+            <a
+              href="#resumen"
+              className="top-nav__link"
+              onClick={(e) => {
+                e.preventDefault()
+                // Cerrar dropdown
+                setBx7GroupOpen(false)
+
+                // Intentar hacer scroll al elemento dentro del SPA
+                const el = document.getElementById('resumen')
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  // También actualizar el hash para reflejar navegación
+                  if (window.history && window.history.replaceState) {
+                    try {
+                      window.history.replaceState(null, '', '#resumen')
+                    } catch (err) {
+                      // ignore
+                    }
+                  } else {
+                    window.location.hash = '#resumen'
+                  }
+                } else {
+                  // Si no existe la sección, redirigir a la raíz (landing fuera del SPA)
+                  window.location.href = '/'
+                }
+              }}
+            >
+              Inicio
+            </a>
+
+            <div className="top-nav__group">
+              <button
+                type="button"
+                className={`top-nav__link top-nav__group-trigger ${bx7GroupOpen ? 'top-nav__group-trigger--open' : ''}`}
+                onClick={() => setBx7GroupOpen((current) => !current)}
+                aria-expanded={bx7GroupOpen}
+              >
+                BX7Group
+                <ChevronDown size={15} />
+              </button>
+
+              {bx7GroupOpen ? (
+                <div className="top-nav__group-menu" role="menu" aria-label="BX7Group">
+                  {filteredBx7GroupNavigation.length > 0 ? (
+                    filteredBx7GroupNavigation.map((item) => (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        className="top-nav__group-item"
+                        role="menuitem"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          // Navigate in the same tab and close the dropdown
+                          setBx7GroupOpen(false)
+                          window.location.href = item.href
+                        }}
+                      >
+                        <strong>{item.label}</strong>
+                        <span>{item.description}</span>
+                      </a>
+                    ))
+                  ) : (
+                    <div className="top-nav__group-empty">Sin resultados para esta búsqueda.</div>
+                  )}
+                </div>
+              ) : null}
+            </div>
           </div>
 
           <div className="top-nav__user">
@@ -357,6 +463,58 @@ export default function App() {
               <div>
                 <ShieldPlus size={16} />
                 Acceso administrativo activo
+              </div>
+            </div>
+          </motion.article>
+        </section>
+
+        <section className="content-grid two-cols" id="bx7group">
+          <motion.article className="panel" id="bx7-wheels" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7Group</p>
+                <h2>BX7 Wheels</h2>
+              </div>
+              <Boxes size={18} />
+            </div>
+
+            <p className="panel-copy">
+              Línea enfocada en rines y accesorios off-road para camionetas 4x4, diseñada para resaltar catálogo y stock operativo.
+            </p>
+
+            <div className="quick-stats">
+              <div>
+                <ShieldCheck size={16} />
+                Catálogo especializado en rines
+              </div>
+              <div>
+                <Truck size={16} />
+                Preparado para flujo de distribución
+              </div>
+            </div>
+          </motion.article>
+
+          <motion.article className="panel" id="teix" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7Group</p>
+                <h2>Teix</h2>
+              </div>
+              <Package size={18} />
+            </div>
+
+            <p className="panel-copy">
+              Submarca para accesorios y complementos con enfoque premium, lista para crecer junto con el inventario BX7.
+            </p>
+
+            <div className="quick-stats">
+              <div>
+                <BarChart3 size={16} />
+                Listo para KPI por categoría
+              </div>
+              <div>
+                <User size={16} />
+                Integrable a futuras tiendas o canales
               </div>
             </div>
           </motion.article>
@@ -452,7 +610,7 @@ export default function App() {
 
             <div className="alert-list">
               {stockAlerts.map((product) => (
-                <div className="alert-item" key={product.id}>
+                <div className="alert-item" key={`${product.id}-${product.sku}`}>
                   <div>
                     <strong>{product.name}</strong>
                     <span>Stock {product.stock} / mínimo {product.minStock}</span>
@@ -499,7 +657,7 @@ export default function App() {
                 </thead>
                 <tbody>
                   {filteredSuppliers.map((supplier) => (
-                    <tr key={supplier.id}>
+                    <tr key={`${supplier.id}-${supplier.name}`}>
                       <td>
                         <strong>{supplier.name}</strong>
                         <span>{supplier.contact}</span>
@@ -660,7 +818,7 @@ export default function App() {
                     </thead>
                     <tbody>
                       {filteredProducts.map((product) => (
-                        <tr key={product.id} className={getProductRowClass(product)}>
+                        <tr key={`${product.id}-${product.sku}`} className={getProductRowClass(product)}>
                           <td>
                             <div style={{display: 'flex', gap: 12, alignItems: 'center'}}>
                               <img src={product.image || '/930.jpg'} alt={product.name} className="product-thumb" />

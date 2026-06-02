@@ -517,6 +517,10 @@ table select option {
   border: 1px solid var(--border);
   background: linear-gradient(180deg, rgba(28, 28, 28, 0.92), rgba(12, 12, 12, 0.94));
   box-shadow: var(--shadow);
+  /* Fijar la navbar en la parte superior mientras se hace scroll */
+  position: sticky;
+  top: calc(var(--brand-bar-height) + 12px);
+  z-index: 10001;
 }
 
 .top-nav__brand {
@@ -552,6 +556,91 @@ table select option {
   flex-wrap: wrap;
 }
 
+.top-nav__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: min(260px, 100%);
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.top-nav__search svg {
+  color: var(--accent-strong);
+  flex: 0 0 auto;
+}
+
+.top-nav__search input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  padding: 0;
+}
+
+.top-nav__search input::placeholder {
+  color: rgba(214, 225, 248, 0.5);
+}
+
+.top-nav__group {
+  position: relative;
+}
+
+.top-nav__group-trigger {
+  cursor: pointer;
+}
+
+.top-nav__group-trigger--open {
+  border-color: rgba(255, 176, 0, 0.26);
+  background: rgba(255, 176, 0, 0.1);
+}
+
+.top-nav__group-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 260px;
+  padding: 10px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(10, 10, 10, 0.98);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 8px;
+  z-index: 25;
+}
+
+.top-nav__group-item {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+}
+
+.top-nav__group-item:hover {
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.top-nav__group-item strong {
+  font-size: 0.95rem;
+}
+
+.top-nav__group-item span,
+.top-nav__group-empty {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.top-nav__group-empty {
+  padding: 10px 4px 4px;
+}
+
 .top-nav__link {
   display: inline-flex;
   align-items: center;
@@ -574,6 +663,8 @@ table select option {
   gap: 12px;
   min-width: 170px;
   justify-content: flex-end;
+  /* Empujar el bloque de usuario al extremo derecho de la barra */
+  margin-left: auto;
 }
 
 .top-nav__user-icon {
@@ -1079,6 +1170,15 @@ tbody tr:hover {
     align-items: stretch;
   }
 
+  .top-nav__search {
+    min-width: 0;
+  }
+
+  .top-nav__group-menu {
+    left: 0;
+    right: auto;
+  }
+
   .top-nav__user {
     justify-content: flex-start;
   }
@@ -1090,6 +1190,17 @@ tbody tr:hover {
   .hero-card {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+  .top-nav__links {
+    justify-content: flex-start;
+  }
+
+  .top-nav__group-menu {
+    position: static;
+    min-width: 100%;
   }
 }
 
