@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2, BarChart3, Boxes, Building2, User, ShieldPlus, CircleHelp } from 'lucide-react'
@@ -85,6 +85,7 @@ export default function App() {
   const [searchProduct, setSearchProduct] = useState('')
   const [navSearch, setNavSearch] = useState('')
   const [bx7GroupOpen, setBx7GroupOpen] = useState(false)
+  const bx7GroupRef = useRef<HTMLDivElement>(null)
   const [productView, setProductView] = useState<'list' | 'create'>('list')
   const [productDraft, setProductDraft] = useState<ProductDraft>(defaultProductDraft)
   const [showProductModal, setShowProductModal] = useState(false)
@@ -101,6 +102,20 @@ export default function App() {
   useEffect(() => {
     writeStorage(productsKey, products)
   }, [products])
+
+  useEffect(() => {
+    if (!bx7GroupOpen) return
+
+    function handlePointerDown(event: MouseEvent) {
+      const target = event.target
+      if (!(target instanceof Node)) return
+      if (bx7GroupRef.current?.contains(target)) return
+      setBx7GroupOpen(false)
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    return () => document.removeEventListener('mousedown', handlePointerDown)
+  }, [bx7GroupOpen])
 
   // On first run, if example rim product not present, add a sample product that uses example image
   useEffect(() => {
@@ -362,7 +377,7 @@ export default function App() {
               Inicio
             </a>
 
-            <div className="top-nav__group">
+            <div className="top-nav__group" ref={bx7GroupRef}>
               <button
                 type="button"
                 className={`top-nav__link top-nav__group-trigger ${bx7GroupOpen ? 'top-nav__group-trigger--open' : ''}`}
@@ -402,12 +417,12 @@ export default function App() {
           </div>
 
           <div className="top-nav__user">
-            <div className="top-nav__user-icon" aria-hidden="true">
-              <User size={16} />
-            </div>
             <div className="top-nav__user-copy">
               <strong>{user.name}</strong>
               <span>{user.role}</span>
+            </div>
+            <div className="top-nav__user-icon" aria-hidden="true">
+              <User size={16} />
             </div>
           </div>
         </nav>
