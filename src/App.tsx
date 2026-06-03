@@ -1,11 +1,14 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2, BarChart3, Boxes, Building2, User, ShieldPlus, CircleHelp } from 'lucide-react'
-import { ChevronDown, Search } from 'lucide-react'
+import { ResumenView } from './components/resumen/ResumenView'
 import { LoginScreen } from './components/LoginScreen'
 import { MetricCard } from './components/MetricCard'
 import { Sidebar } from './components/Sidebar'
+import { TopNav } from './components/TopNav'
+import type { DashboardView } from './types/dashboard'
+import { hashFromView, viewFromHash } from './types/dashboard'
 import { activities, demoCredentials, forecastData, metrics, products as seedProducts, salesData, suppliers as seedSuppliers } from './data/mockData'
 import type { Product, SessionUser, Supplier } from './types'
 import { readStorage, writeStorage } from './utils/storage'
@@ -21,18 +24,6 @@ const demoUser: SessionUser = {
 }
 
 const metricVariants = ['sales', 'products', 'suppliers', 'stock'] as const
-
-const topNavigation = [
-  { label: 'Inicio', href: '#resumen', icon: BarChart3 },
-  { label: 'productos', href: '#productos', icon: Boxes },
-  { label: 'informacion', href: '#informacion', icon: Building2 },
-  { label: 'soporte', href: '#soporte', icon: CircleHelp },
-] as const
-
-const bx7GroupNavigation = [
-  { label: 'BX7 Wheels', href: '/bx7-wheels.html', description: 'Rines y soluciones para 4x4' },
-  { label: 'Teix', href: '#teix', description: 'Accesorios y componentes de marca' },
-] as const
 
 type ProductDraft = {
   name: string
@@ -84,16 +75,27 @@ export default function App() {
   const [searchSupplier, setSearchSupplier] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
   const [navSearch, setNavSearch] = useState('')
-  const [bx7GroupOpen, setBx7GroupOpen] = useState(false)
-  const bx7GroupRef = useRef<HTMLDivElement>(null)
   const [productView, setProductView] = useState<'list' | 'create'>('list')
   const [productDraft, setProductDraft] = useState<ProductDraft>(defaultProductDraft)
   const [showProductModal, setShowProductModal] = useState(false)
   const [editingProductId, setEditingProductId] = useState<number | null>(null)
+  const [activeView, setActiveView] = useState<DashboardView>(
+    () => viewFromHash(window.location.hash) ?? 'resumen',
+  )
 
   useEffect(() => {
     writeStorage(sessionKey, user)
   }, [user])
+
+  useEffect(() => {
+    function handleHashChange() {
+      const view = viewFromHash(window.location.hash)
+      if (view) setActiveView(view)
+    }
+
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   useEffect(() => {
     writeStorage(suppliersKey, suppliers)
@@ -102,20 +104,6 @@ export default function App() {
   useEffect(() => {
     writeStorage(productsKey, products)
   }, [products])
-
-  useEffect(() => {
-    if (!bx7GroupOpen) return
-
-    function handlePointerDown(event: MouseEvent) {
-      const target = event.target
-      if (!(target instanceof Node)) return
-      if (bx7GroupRef.current?.contains(target)) return
-      setBx7GroupOpen(false)
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    return () => document.removeEventListener('mousedown', handlePointerDown)
-  }, [bx7GroupOpen])
 
   // On first run, if example rim product not present, add a sample product that uses example image
   useEffect(() => {
@@ -160,31 +148,6 @@ export default function App() {
     }),
     [products],
   )
-
-  const filteredTopNavigation = useMemo(() => {
-    const query = navSearch.trim().toLowerCase()
-
-    if (!query) {
-      return topNavigation
-    }
-
-    return topNavigation.filter((item) => item.label.toLowerCase().includes(query))
-  }, [navSearch])
-
-  const filteredBx7GroupNavigation = useMemo(() => {
-    const query = navSearch.trim().toLowerCase()
-
-    if (!query) {
-      return bx7GroupNavigation
-    }
-
-    return bx7GroupNavigation.filter((item) => item.label.toLowerCase().includes(query) || item.description.toLowerCase().includes(query))
-  }, [navSearch])
-
-  const shouldShowBx7Group =
-    navSearch.trim().length === 0 ||
-    'bx7group'.includes(navSearch.trim().toLowerCase()) ||
-    filteredBx7GroupNavigation.length > 0
 
   function handleLogin(email: string, password: string) {
     const validLogin = email.toLowerCase() === demoCredentials.email && password === demoCredentials.password
@@ -316,122 +279,47 @@ export default function App() {
     return product.stock <= product.minStock ? 'stock-critical' : ''
   }
 
+  function handleNavigate(view: DashboardView) {
+    setActiveView(view)
+    try {
+      window.history.replaceState(null, '', hashFromView(view))
+    } catch {
+      window.location.hash = hashFromView(view)
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   if (!user) {
     return <LoginScreen onLogin={handleLogin} error={loginError} />
   }
 
   return (
     <div className="app-shell">
-      <Sidebar user={user} onLogout={handleLogout} />
+      <Sidebar user={user} activeView={activeView} onNavigate={handleNavigate} onLogout={handleLogout} />
 
       <main className="dashboard">
-        <nav className="top-nav" aria-label="Navegación principal">
-          <div className="top-nav__brand">
-            <span className="top-nav__brand-pill">BX7 ERP</span>
-          </div>
+        <TopNav user={user} searchValue={navSearch} onSearchChange={setNavSearch} onLogout={handleLogout} />
 
-          <div className="top-nav__search">
-            <Search size={15} />
-            <input
-              type="search"
-              value={navSearch}
-              onChange={(event) => {
-                setNavSearch(event.target.value)
-                setBx7GroupOpen(true)
-              }}
-              placeholder="Buscar opciones"
-              aria-label="Buscar opciones de navegación"
-            />
-          </div>
+        {activeView === 'resumen' ? (
+          <ResumenView
+            onSectionNavigate={(section) => {
+              const map: Record<string, DashboardView> = {
+                Catálogo: 'productos',
+                Marcas: 'marcas',
+                Proveedores: 'proveedores',
+                Inventario: 'productos',
+                Ventas: 'ventas',
+                Reportes: 'predicciones',
+                'IA BX7': 'predicciones',
+              }
+              const view = map[section]
+              if (view) handleNavigate(view)
+            }}
+          />
+        ) : null}
 
-          <div className="top-nav__links">
-            {/* Mostrar Inicio junto a BX7Group */}
-            <a
-              href="#resumen"
-              className="top-nav__link"
-              onClick={(e) => {
-                e.preventDefault()
-                // Cerrar dropdown
-                setBx7GroupOpen(false)
-
-                // Intentar hacer scroll al elemento dentro del SPA
-                const el = document.getElementById('resumen')
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                  // También actualizar el hash para reflejar navegación
-                  if (window.history && window.history.replaceState) {
-                    try {
-                      window.history.replaceState(null, '', '#resumen')
-                    } catch (err) {
-                      // ignore
-                    }
-                  } else {
-                    window.location.hash = '#resumen'
-                  }
-                } else {
-                  // Si no existe la sección, redirigir a la raíz (landing fuera del SPA)
-                  window.location.href = '/'
-                }
-              }}
-            >
-              Inicio
-            </a>
-
-            <div className="top-nav__group" ref={bx7GroupRef}>
-              <button
-                type="button"
-                className={`top-nav__link top-nav__group-trigger ${bx7GroupOpen ? 'top-nav__group-trigger--open' : ''}`}
-                onClick={() => setBx7GroupOpen((current) => !current)}
-                aria-expanded={bx7GroupOpen}
-              >
-                BX7Group
-                <ChevronDown size={15} />
-              </button>
-
-              {bx7GroupOpen ? (
-                <div className="top-nav__group-menu" role="menu" aria-label="BX7Group">
-                  {filteredBx7GroupNavigation.length > 0 ? (
-                    filteredBx7GroupNavigation.map((item) => (
-                      <a
-                        key={item.href}
-                        href={item.href}
-                        className="top-nav__group-item"
-                        role="menuitem"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          // Navigate in the same tab and close the dropdown
-                          setBx7GroupOpen(false)
-                          window.location.href = item.href
-                        }}
-                      >
-                        <strong>{item.label}</strong>
-                        <span>{item.description}</span>
-                      </a>
-                    ))
-                  ) : (
-                    <div className="top-nav__group-empty">Sin resultados para esta búsqueda.</div>
-                  )}
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="top-nav__user">
-            <div className="top-nav__user-copy">
-              <strong>{user.name}</strong>
-              <span>{user.role}</span>
-            </div>
-            <div className="top-nav__user-icon" aria-hidden="true">
-              <User size={16} />
-            </div>
-          </div>
-        </nav>
-
-        <section className="panel dashboard-banner" id="resumen">
-          <img className="dashboard-banner-image" src="/BANNER%200.jpg" alt="Banner BX7" />
-        </section>
-
-        <section className="content-grid two-cols" id="informacion">
+        {activeView === 'clientes' ? (
+        <section className="content-grid two-cols dashboard-view" id="informacion">
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <div className="panel-head">
               <div>
@@ -457,6 +345,7 @@ export default function App() {
             </div>
           </motion.article>
 
+          <div id="configuracion" className="nav-anchor" aria-hidden="true" />
           <motion.article className="panel" id="soporte" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
             <div className="panel-head">
               <div>
@@ -482,8 +371,10 @@ export default function App() {
             </div>
           </motion.article>
         </section>
+        ) : null}
 
-        <section className="content-grid two-cols" id="bx7group">
+        {activeView === 'empresas' ? (
+        <section className="content-grid two-cols dashboard-view" id="bx7group">
           <motion.article className="panel" id="bx7-wheels" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <div className="panel-head">
               <div>
@@ -534,8 +425,71 @@ export default function App() {
             </div>
           </motion.article>
         </section>
+        ) : null}
 
-        <section className="hero-card" id="resumen">
+        {activeView === 'marcas' ? (
+        <section className="dashboard-view" id="teix">
+          <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7Group</p>
+                <h2>Teix</h2>
+              </div>
+              <Package size={18} />
+            </div>
+
+            <p className="panel-copy">
+              Submarca para accesorios y complementos con enfoque premium, lista para crecer junto con el inventario BX7.
+            </p>
+
+            <div className="quick-stats">
+              <div>
+                <BarChart3 size={16} />
+                Listo para KPI por categoría
+              </div>
+              <div>
+                <User size={16} />
+                Integrable a futuras tiendas o canales
+              </div>
+            </div>
+          </motion.article>
+        </section>
+        ) : null}
+
+        {activeView === 'soporte' || activeView === 'configuracion' ? (
+        <section className="dashboard-view" id="soporte">
+          <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7 soporte</p>
+                <h2>{activeView === 'configuracion' ? 'Configuración' : 'Ayuda y contacto'}</h2>
+              </div>
+              <CircleHelp size={18} />
+            </div>
+
+            <p className="panel-copy">
+              {activeView === 'configuracion'
+                ? 'Ajustes generales del ERP, preferencias de cuenta y parámetros operativos del sistema.'
+                : 'Si necesitas ayuda operativa o soporte técnico, este espacio queda listo para centralizar solicitudes y seguimiento.'}
+            </p>
+
+            <div className="quick-stats">
+              <div>
+                <User size={16} />
+                {user.name} · {user.role}
+              </div>
+              <div>
+                <ShieldPlus size={16} />
+                Acceso administrativo activo
+              </div>
+            </div>
+          </motion.article>
+        </section>
+        ) : null}
+
+        {activeView === 'ventas' ? (
+        <>
+        <section className="hero-card dashboard-view" id="ventas">
           <div className="hero-stats">
             <article className="metric-card metric-card--small metric-card--sales">
               <div className="metric-icon" aria-hidden="true">
@@ -649,8 +603,11 @@ export default function App() {
             </div>
           </motion.article>
         </section>
+        </>
+        ) : null}
 
-        <section className="content-stack" id="proveedores">
+        {activeView === 'proveedores' ? (
+        <section className="content-stack dashboard-view" id="proveedores">
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <div className="panel-head">
               <div>
@@ -697,8 +654,10 @@ export default function App() {
             </div>
           </motion.article>
         </section>
+        ) : null}
 
-        <section className="content-stack" id="productos">
+        {activeView === 'productos' ? (
+        <section className="content-stack dashboard-view" id="productos">
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             {productView === 'list' ? (
               <div className="product-list-view">
@@ -978,8 +937,10 @@ export default function App() {
             )}
           </motion.article>
         </section>
-        
-        <section className="content-grid two-cols" id="predicciones">
+        ) : null}
+
+        {activeView === 'predicciones' ? (
+        <section className="content-grid two-cols dashboard-view" id="predicciones">
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <div className="panel-head">
               <div>
@@ -1042,6 +1003,7 @@ export default function App() {
             </div>
           </motion.article>
         </section>
+        ) : null}
       </main>
     </div>
   )

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" role="img" aria-label="BX7 Wheels">
+  <circle cx="26" cy="26" r="26" fill="#080808"/>
+  <path d="M15 12h6l-6 6h-6l6-6Z" fill="#ff2a1a"/>
+  <path d="M21 12h5l-5 6h-5l5-6Z" fill="#ff7a00"/>
+  <path d="M26 12h5l-5 6h-5l5-6Z" fill="#ffba00"/>
+  <text x="11" y="36" fill="#ffffff" font-family="Arial Black, Arial, sans-serif" font-size="11" font-weight="900" letter-spacing="-0.5">BX</text>
+  <text x="30" y="36" fill="#ff7a00" font-family="Arial Black, Arial, sans-serif" font-size="11" font-weight="900">7</text>
+</svg>

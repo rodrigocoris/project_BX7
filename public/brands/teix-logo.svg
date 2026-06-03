@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 44" role="img" aria-label="TEIX">
+  <text x="2" y="20" fill="#ffffff" font-family="Arial Black, Impact, sans-serif" font-size="18" font-weight="900" letter-spacing="0.14em">TEIX</text>
+  <g transform="translate(2 26)">
+    <path d="M0 0 H14 L10 8 H0 Z" fill="#e30613"/>
+    <path d="M12 0 H26 L22 8 H8 Z" fill="#c41e3a"/>
+    <path d="M24 0 H38 L34 8 H20 Z" fill="#e30613"/>
+    <path d="M36 0 H50 L46 8 H32 Z" fill="#ff2a1a" opacity="0.9"/>
+    <path d="M48 0 H62 L58 8 H44 Z" fill="#b91c1c"/>
+  </g>
+</svg>
