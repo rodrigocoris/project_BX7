@@ -4,7 +4,7 @@ import App from './App'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import './styles.css'
 
-document.title = 'BX7 ERP'
+document.title = 'BX7'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

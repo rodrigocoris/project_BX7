@@ -44,11 +44,11 @@ export const resumenChartData = [
 ]
 
 export const resumenTopBrands = [
-  { name: 'FOX', revenue: '$8,250,000', growth: '+18.5%', progress: 92, logo: 'FOX', logoStyle: 'fox' },
-  { name: 'BX7 Wheels', revenue: '$6,120,000', growth: '+14.2%', progress: 78, logo: 'BX7', logoStyle: 'bx7' },
-  { name: 'Dobinsons', revenue: '$4,890,000', growth: '+11.8%', progress: 65, logo: 'Dob', logoStyle: 'dobinsons' },
-  { name: 'KC Hilites', revenue: '$3,640,000', growth: '+9.4%', progress: 52, logo: 'KC', logoStyle: 'kc' },
-  { name: 'Eibach', revenue: '$2,980,000', growth: '+7.6%', progress: 44, logo: 'Eib', logoStyle: 'eibach' },
+  { id: 'fox' as const, name: 'FOX', revenue: '$8,250,000', growth: '+18.5%', progress: 92 },
+  { id: 'bx7-wheels' as const, name: 'BX7 Wheels', revenue: '$6,120,000', growth: '+14.2%', progress: 78 },
+  { id: 'dobinsons' as const, name: 'Dobinsons', revenue: '$4,890,000', growth: '+11.8%', progress: 65 },
+  { id: 'kc-hilites' as const, name: 'KC Hilites', revenue: '$3,640,000', growth: '+9.4%', progress: 52 },
+  { id: 'eibach' as const, name: 'Eibach', revenue: '$2,980,000', growth: '+7.6%', progress: 44 },
 ] as const
 
 export const resumenActivities = [
@@ -60,20 +60,20 @@ export const resumenActivities = [
 ] as const
 
 export const quickAccessLinks = [
-  'Catálogo de productos',
-  'Lista de precios',
-  'Clientes mayoristas',
-  'Órdenes de compra',
-  'Inventario general',
-  'Reportes ejecutivos',
+  { label: 'Catálogo de productos', icon: 'catalog' as const },
+  { label: 'Lista de precios', icon: 'prices' as const },
+  { label: 'Clientes mayoristas', icon: 'clients' as const },
+  { label: 'Órdenes de compra', icon: 'orders' as const },
+  { label: 'Inventario general', icon: 'inventory' as const },
+  { label: 'Reportes ejecutivos', icon: 'reports' as const },
 ] as const
 
 export const businessUnits = [
-  { label: 'Distribución', icon: 'globe' as const },
-  { label: 'Desarrollo', icon: 'rocket' as const },
-  { label: 'Importación', icon: 'import' as const },
-  { label: 'Marketing', icon: 'megaphone' as const },
-]
+  { label: 'Distribución', description: 'Marcas internacionales', icon: 'globe' as const },
+  { label: 'Desarrollo', description: 'Nuevos productos', icon: 'rocket' as const },
+  { label: 'Importación', description: 'Gestión de importaciones', icon: 'import' as const },
+  { label: 'Marketing', description: 'Marca y estrategia', icon: 'megaphone' as const },
+] as const
 
 export const resumenSubNavItems = [
   'Empresas',

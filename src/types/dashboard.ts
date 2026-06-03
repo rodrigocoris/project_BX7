@@ -1,12 +1,14 @@
 export type DashboardView =
   | 'resumen'
-  | 'productos'
+  | 'catalogo'
+  | 'inventario'
   | 'empresas'
   | 'marcas'
   | 'proveedores'
   | 'ventas'
   | 'clientes'
   | 'predicciones'
+  | 'reportes'
   | 'configuracion'
   | 'soporte'
 
@@ -15,9 +17,9 @@ export function viewFromHash(hash: string): DashboardView | null {
 
   const map: Record<string, DashboardView> = {
     resumen: 'resumen',
-    productos: 'productos',
-    catalogo: 'productos',
-    inventario: 'productos',
+    catalogo: 'catalogo',
+    productos: 'catalogo',
+    inventario: 'inventario',
     bx7group: 'empresas',
     empresas: 'empresas',
     'bx7-wheels': 'empresas',
@@ -28,7 +30,7 @@ export function viewFromHash(hash: string): DashboardView | null {
     clientes: 'clientes',
     informacion: 'clientes',
     predicciones: 'predicciones',
-    reportes: 'predicciones',
+    reportes: 'reportes',
     configuracion: 'configuracion',
     soporte: 'soporte',
   }
@@ -39,13 +41,15 @@ export function viewFromHash(hash: string): DashboardView | null {
 export function hashFromView(view: DashboardView): string {
   const map: Record<DashboardView, string> = {
     resumen: 'resumen',
-    productos: 'productos',
+    catalogo: 'catalogo',
+    inventario: 'inventario',
     empresas: 'bx7group',
     marcas: 'teix',
     proveedores: 'proveedores',
     ventas: 'ventas',
     clientes: 'clientes',
     predicciones: 'predicciones',
+    reportes: 'reportes',
     configuracion: 'configuracion',
     soporte: 'soporte',
   }

@@ -1,21 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   ArrowRight,
-  BarChart3,
-  Boxes,
+  BookOpen,
   Briefcase,
   Building2,
   ChevronDown,
-  Download,
-  FileText,
+  FileBarChart,
   Globe,
+  ListFilter,
   Megaphone,
-  Package,
   Rocket,
-  ShoppingCart,
+  ShoppingBag,
   Sparkles,
   Star,
   Truck,
+  Upload,
   Users,
   Zap,
 } from 'lucide-react'
@@ -23,7 +22,21 @@ import { businessUnits, quickAccessLinks, resumenSubNavItems } from '../../data/
 import { DistributedBrandsList } from './DistributedBrandsList'
 import { OwnBrandsList } from './OwnBrandsLogos'
 
-const quickAccessIcons = [Boxes, FileText, Users, ShoppingCart, Package, BarChart3] as const
+const unitIcons = {
+  globe: Globe,
+  rocket: Rocket,
+  import: Upload,
+  megaphone: Megaphone,
+} as const
+
+const quickAccessIcons = {
+  catalog: BookOpen,
+  prices: ListFilter,
+  clients: Users,
+  orders: ShoppingBag,
+  inventory: Briefcase,
+  reports: FileBarChart,
+} as const
 
 type ResumenSubNavProps = {
   onNavigate?: (section: string) => void
@@ -80,7 +93,7 @@ export function ResumenSubNav({ onNavigate }: ResumenSubNavProps) {
         <div className="resumen-mega" role="region" aria-label="Menú Empresas">
           <div className="resumen-mega__col">
             <div className="resumen-mega__head">
-              <Building2 size={16} />
+              <Building2 size={16} className="resumen-mega__head-icon" strokeWidth={2} />
               <span>GRUPO EMPRESARIAL</span>
             </div>
             <p className="resumen-mega__title">BX7 Group</p>
@@ -92,7 +105,7 @@ export function ResumenSubNav({ onNavigate }: ResumenSubNavProps) {
 
           <div className="resumen-mega__col resumen-mega__col--own-brands">
             <div className="resumen-mega__head">
-              <Star size={16} className="resumen-mega__head-star" strokeWidth={2} />
+              <Star size={16} className="resumen-mega__head-icon" strokeWidth={2} />
               <span>MARCAS PROPIAS</span>
             </div>
             <OwnBrandsList />
@@ -103,7 +116,7 @@ export function ResumenSubNav({ onNavigate }: ResumenSubNavProps) {
 
           <div className="resumen-mega__col resumen-mega__col--distributed">
             <div className="resumen-mega__head">
-              <Truck size={16} className="resumen-mega__head-truck" strokeWidth={2} />
+              <Truck size={16} className="resumen-mega__head-icon" strokeWidth={2} />
               <span>MARCAS DISTRIBUIDAS</span>
             </div>
             <DistributedBrandsList />
@@ -112,19 +125,21 @@ export function ResumenSubNav({ onNavigate }: ResumenSubNavProps) {
             </button>
           </div>
 
-          <div className="resumen-mega__col">
+          <div className="resumen-mega__col resumen-mega__col--units">
             <div className="resumen-mega__head">
-              <Briefcase size={16} />
+              <Briefcase size={16} className="resumen-mega__head-icon" strokeWidth={2} />
               <span>UNIDADES DE NEGOCIO</span>
             </div>
             <ul className="resumen-mega__units">
               {businessUnits.map((unit) => {
-                const Icon =
-                  unit.icon === 'globe' ? Globe : unit.icon === 'rocket' ? Rocket : unit.icon === 'import' ? Download : Megaphone
+                const Icon = unitIcons[unit.icon]
                 return (
                   <li key={unit.label}>
-                    <Icon size={15} />
-                    {unit.label}
+                    <Icon size={18} strokeWidth={2} className="resumen-mega__row-icon" aria-hidden="true" />
+                    <div className="resumen-mega__row-copy">
+                      <strong>{unit.label}</strong>
+                      <span>{unit.description}</span>
+                    </div>
                   </li>
                 )
               })}
@@ -134,18 +149,18 @@ export function ResumenSubNav({ onNavigate }: ResumenSubNavProps) {
             </button>
           </div>
 
-          <div className="resumen-mega__col">
+          <div className="resumen-mega__col resumen-mega__col--quick">
             <div className="resumen-mega__head">
-              <Zap size={16} />
+              <Zap size={16} className="resumen-mega__head-icon" strokeWidth={2} />
               <span>ACCESOS RÁPIDOS</span>
             </div>
             <ul className="resumen-mega__quick">
-              {quickAccessLinks.map((link, index) => {
-                const Icon = quickAccessIcons[index]
+              {quickAccessLinks.map((link) => {
+                const Icon = quickAccessIcons[link.icon]
                 return (
-                  <li key={link}>
-                    <Icon size={15} />
-                    {link}
+                  <li key={link.label}>
+                    <Icon size={18} strokeWidth={2} className="resumen-mega__row-icon" aria-hidden="true" />
+                    <span className="resumen-mega__row-label">{link.label}</span>
                   </li>
                 )
               })}

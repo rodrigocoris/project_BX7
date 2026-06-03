@@ -5,7 +5,6 @@ import {
   Factory,
   Headphones,
   LayoutGrid,
-  LogOut,
   Package,
   Settings,
   ShoppingCart,
@@ -13,32 +12,29 @@ import {
   Star,
   Users,
 } from 'lucide-react'
-import type { SessionUser } from '../types'
 import type { DashboardView } from '../types/dashboard'
 import { Bx7Brand } from './Bx7Brand'
 
 type SidebarProps = {
-  user: SessionUser
   activeView: DashboardView
   onNavigate: (view: DashboardView) => void
-  onLogout: () => void
 }
 
 const navigation: { label: string; view: DashboardView; icon: typeof LayoutGrid }[] = [
   { label: 'Resumen', view: 'resumen', icon: LayoutGrid },
-  { label: 'Catálogo', view: 'productos', icon: BookOpen },
+  { label: 'Catálogo', view: 'catalogo', icon: BookOpen },
   { label: 'Empresas', view: 'empresas', icon: Building2 },
   { label: 'Marcas', view: 'marcas', icon: Star },
   { label: 'Proveedores', view: 'proveedores', icon: Factory },
-  { label: 'Inventario', view: 'productos', icon: Package },
+  { label: 'Inventario', view: 'inventario', icon: Package },
   { label: 'Ventas', view: 'ventas', icon: ShoppingCart },
   { label: 'Clientes', view: 'clientes', icon: Users },
   { label: 'Predicciones IA', view: 'predicciones', icon: Sparkles },
-  { label: 'Reportes', view: 'predicciones', icon: BarChart3 },
+  { label: 'Reportes', view: 'reportes', icon: BarChart3 },
   { label: 'Configuración', view: 'configuracion', icon: Settings },
 ]
 
-export function Sidebar({ activeView, onNavigate, onLogout }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -52,7 +48,7 @@ export function Sidebar({ activeView, onNavigate, onLogout }: SidebarProps) {
 
           return (
             <button
-              key={`${item.label}-${item.view}`}
+              key={item.view}
               type="button"
               className={`sidebar-link${isActive ? ' sidebar-link--active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
@@ -78,11 +74,6 @@ export function Sidebar({ activeView, onNavigate, onLogout }: SidebarProps) {
             <strong>¿Necesitas ayuda?</strong>
             <span>Centro de soporte</span>
           </span>
-        </button>
-
-        <button type="button" className="logout-button" onClick={onLogout}>
-          <LogOut size={16} />
-          Salir
         </button>
       </div>
     </aside>

@@ -98,6 +98,12 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (activeView !== 'catalogo' && productView === 'create') {
+      setProductView('list')
+    }
+  }, [activeView, productView])
+
+  useEffect(() => {
     writeStorage(suppliersKey, suppliers)
   }, [suppliers])
 
@@ -140,6 +146,17 @@ export default function App() {
     () => products.filter((product) => product.name.toLowerCase().includes(searchProduct.toLowerCase())),
     [products, searchProduct],
   )
+
+  const tableProducts = useMemo(() => {
+    if (activeView !== 'inventario') return filteredProducts
+
+    return [...filteredProducts].sort((a, b) => {
+      const aCritical = a.stock <= a.minStock
+      const bCritical = b.stock <= b.minStock
+      if (aCritical !== bCritical) return aCritical ? -1 : 1
+      return a.stock - b.stock
+    })
+  }, [activeView, filteredProducts])
 
   const productStats = useMemo(
     () => ({
@@ -295,7 +312,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar user={user} activeView={activeView} onNavigate={handleNavigate} onLogout={handleLogout} />
+      <Sidebar activeView={activeView} onNavigate={handleNavigate} />
 
       <main className="dashboard">
         <TopNav user={user} searchValue={navSearch} onSearchChange={setNavSearch} onLogout={handleLogout} />
@@ -304,12 +321,12 @@ export default function App() {
           <ResumenView
             onSectionNavigate={(section) => {
               const map: Record<string, DashboardView> = {
-                Catálogo: 'productos',
+                Catálogo: 'catalogo',
                 Marcas: 'marcas',
                 Proveedores: 'proveedores',
-                Inventario: 'productos',
+                Inventario: 'inventario',
                 Ventas: 'ventas',
-                Reportes: 'predicciones',
+                Reportes: 'reportes',
                 'IA BX7': 'predicciones',
               }
               const view = map[section]
@@ -656,9 +673,33 @@ export default function App() {
         </section>
         ) : null}
 
-        {activeView === 'productos' ? (
-        <section className="content-stack dashboard-view" id="productos">
+        {activeView === 'catalogo' || activeView === 'inventario' ? (
+        <section className="content-stack dashboard-view" id={activeView}>
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">{activeView === 'catalogo' ? 'BX7 catálogo' : 'BX7 inventario'}</p>
+                <h2>{activeView === 'catalogo' ? 'Catálogo de productos' : 'Control de inventario'}</h2>
+              </div>
+              {activeView === 'catalogo' ? <Package size={18} /> : <AlertTriangle size={18} />}
+            </div>
+
+            {activeView === 'inventario' && stockAlerts.length > 0 ? (
+              <div className="alert-list" style={{ marginBottom: 16 }}>
+                {stockAlerts.map((product) => (
+                  <div className="alert-item" key={`alert-${product.id}-${product.sku}`}>
+                    <div>
+                      <strong>{product.name}</strong>
+                      <span>Stock {product.stock} / mínimo {product.minStock}</span>
+                    </div>
+                    <button type="button" onClick={() => restockProduct(product.id)}>
+                      Reponer
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
             {productView === 'list' ? (
               <div className="product-list-view">
                 <div className="products-header">
@@ -682,12 +723,16 @@ export default function App() {
                   <div className="products-actions">
                     <div className="products-tabs">
                       <button type="button" className="tab-button tab-button--active" onClick={() => setProductView('list')}>Lista</button>
-                      <button type="button" className="tab-button" onClick={() => setProductView('create')}>Alta rápida</button>
+                      {activeView === 'catalogo' ? (
+                        <button type="button" className="tab-button" onClick={() => setProductView('create')}>Alta rápida</button>
+                      ) : null}
                     </div>
 
-                    <button type="button" className="primary-button add-product-button" onClick={() => setShowProductModal(true)}>
-                      Agregar producto
-                    </button>
+                    {activeView === 'catalogo' ? (
+                      <button type="button" className="primary-button add-product-button" onClick={() => setShowProductModal(true)}>
+                        Agregar producto
+                      </button>
+                    ) : null}
                   </div>
                 </div>
 
@@ -791,7 +836,7 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map((product) => (
+                      {tableProducts.map((product) => (
                         <tr key={`${product.id}-${product.sku}`} className={getProductRowClass(product)}>
                           <td>
                             <div style={{display: 'flex', gap: 12, alignItems: 'center'}}>
@@ -935,6 +980,79 @@ export default function App() {
                 </aside>
               </div>
             )}
+          </motion.article>
+        </section>
+        ) : null}
+
+        {activeView === 'reportes' ? (
+        <section className="content-grid dashboard-view" id="reportes">
+          <section className="metrics-grid">
+            {metrics.map((metric, index) => (
+              <MetricCard
+                key={metric.label}
+                index={index}
+                label={metric.label}
+                value={metric.value}
+                delta={metric.delta}
+                variant={metricVariants[index]}
+              />
+            ))}
+          </section>
+
+          <motion.article className="panel chart-panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7 reportes</p>
+                <h2>Resumen comercial</h2>
+              </div>
+              <BarChart3 size={18} />
+            </div>
+
+            <div className="chart-box">
+              <ResponsiveContainer width="100%" height={290}>
+                <AreaChart data={salesData}>
+                  <defs>
+                    <linearGradient id="reportGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ff5a1f" stopOpacity={0.46} />
+                      <stop offset="95%" stopColor="#ffb000" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.08)" />
+                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.52)" />
+                  <YAxis stroke="rgba(255,255,255,0.52)" />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'rgba(8, 8, 8, 0.96)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: 16,
+                    }}
+                  />
+                  <Area type="monotone" dataKey="ingresos" stroke="#ffb000" strokeWidth={3} fill="url(#reportGradient)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.article>
+
+          <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
+            <div className="panel-head">
+              <div>
+                <p className="eyebrow">BX7 actividad</p>
+                <h2>Eventos recientes</h2>
+              </div>
+              <PanelLeft size={18} />
+            </div>
+
+            <div className="activity-list">
+              {activities.map((activity) => (
+                <div key={activity.title} className="activity-item">
+                  <div>
+                    <strong>{activity.title}</strong>
+                    <span>{activity.detail}</span>
+                  </div>
+                  <small>{activity.time}</small>
+                </div>
+              ))}
+            </div>
           </motion.article>
         </section>
         ) : null}

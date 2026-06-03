@@ -442,7 +442,9 @@ table select option {
   gap: 20px;
   position: sticky;
   top: 24px;
-  height: calc(100vh - 48px);
+  align-self: start;
+  height: auto;
+  max-height: none;
 }
 
 .sidebar-brand {
@@ -479,10 +481,8 @@ table select option {
 .sidebar-nav {
   display: grid;
   gap: 4px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 2px;
+  flex: 0 0 auto;
+  overflow: visible;
 }
 
 .sidebar-link {
@@ -521,10 +521,10 @@ table select option {
 }
 
 .sidebar-footer {
-  margin-top: auto;
   display: grid;
   gap: 12px;
   padding-top: 8px;
+  flex-shrink: 0;
 }
 
 .sidebar-support {

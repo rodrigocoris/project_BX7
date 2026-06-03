@@ -1,4 +1,6 @@
-/** Logos vectoriales inspirados en las marcas distribuidas (uso en UI del ERP). */
+import { useId } from 'react'
+
+/** Logos vectoriales compartidos (Marcas distribuidas y Marcas principales). */
 
 export function FoxMark() {
   return (
@@ -19,11 +21,13 @@ export function FoxMark() {
 }
 
 export function DobinsonsMark() {
+  const gradientId = useId()
+
   return (
     <span className="distributed-brand-logo distributed-brand-logo--dobinsons" aria-hidden="true">
       <svg viewBox="0 0 40 40" role="presentation" focusable="false">
         <defs>
-          <linearGradient id="dobGrad" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#7c3aed" />
             <stop offset="50%" stopColor="#a855f7" />
             <stop offset="100%" stopColor="#facc15" />
@@ -33,7 +37,7 @@ export function DobinsonsMark() {
         <text
           x="4"
           y="24"
-          fill="url(#dobGrad)"
+          fill={`url(#${gradientId})`}
           fontFamily="Arial, sans-serif"
           fontSize="7.5"
           fontWeight="800"
@@ -113,4 +117,40 @@ export function VossenMark() {
       </svg>
     </span>
   )
+}
+
+export function Bx7WheelsMark() {
+  return (
+    <span className="distributed-brand-logo distributed-brand-logo--bx7" aria-hidden="true">
+      <svg viewBox="0 0 40 40" role="presentation" focusable="false">
+        <rect width="40" height="40" rx="8" fill="#080808" />
+        <path d="M12 10h5L11 15H8l4-5Z" fill="#ff2a1a" />
+        <path d="M17 10h4L16 15H13l4-5Z" fill="#ff7a00" />
+        <path d="M21 10h4L20 15H17l4-5Z" fill="#ffba00" />
+        <text x="9" y="28" fill="#ffffff" fontFamily="Arial Black, Arial, sans-serif" fontSize="9" fontWeight="900">
+          BX
+        </text>
+        <text x="23" y="28" fill="#ff7a00" fontFamily="Arial Black, Arial, sans-serif" fontSize="9" fontWeight="900">
+          7
+        </text>
+      </svg>
+    </span>
+  )
+}
+
+export const brandMarks = {
+  fox: FoxMark,
+  dobinsons: DobinsonsMark,
+  'kc-hilites': KcHilitesMark,
+  eibach: EibachMark,
+  method: MethodMark,
+  vossen: VossenMark,
+  'bx7-wheels': Bx7WheelsMark,
+} as const
+
+export type BrandMarkId = keyof typeof brandMarks
+
+export function BrandMark({ id }: { id: BrandMarkId }) {
+  const Mark = brandMarks[id]
+  return <Mark />
 }

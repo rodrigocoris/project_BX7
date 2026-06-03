@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { resumenActivities, resumenChartData, resumenKpis, resumenTopBrands } from '../../data/resumenData'
+import { BrandMark } from './DistributedBrandMarks'
 
 function KpiIcon({ icon, tone }: { icon: string; tone: string }) {
   const className = `resumen-kpi__icon resumen-kpi__icon--${tone}`
@@ -42,10 +43,6 @@ function ActivityIcon({ icon, tone }: { icon: string; tone: string }) {
   )
 }
 
-function BrandLogo({ name, style }: { name: string; style: string }) {
-  return <span className={`resumen-brand-logo resumen-brand-logo--${style}`}>{name}</span>
-}
-
 export function ResumenDashboard() {
   return (
     <div className="resumen-dashboard">
@@ -72,8 +69,7 @@ export function ResumenDashboard() {
         </div>
       </section>
 
-      <div className="resumen-main-grid">
-        <section className="resumen-panel resumen-chart-panel" aria-labelledby="resumen-chart-title">
+      <section className="resumen-panel resumen-chart-panel" aria-labelledby="resumen-chart-title">
           <div className="resumen-panel__head">
             <h3 id="resumen-chart-title">Ventas y Tendencias</h3>
           </div>
@@ -120,10 +116,10 @@ export function ResumenDashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </section>
+      </section>
 
-        <div className="resumen-side-column">
-          <section className="resumen-panel resumen-brands-panel" aria-labelledby="resumen-brands-title">
+      <div className="resumen-bottom-grid">
+        <section className="resumen-panel resumen-brands-panel" aria-labelledby="resumen-brands-title">
             <div className="resumen-panel__head">
               <h3 id="resumen-brands-title">Marcas Principales</h3>
               <button type="button" className="resumen-panel__link">
@@ -134,7 +130,7 @@ export function ResumenDashboard() {
             <ul className="resumen-brands-list">
               {resumenTopBrands.map((brand) => (
                 <li key={brand.name} className="resumen-brand-row">
-                  <BrandLogo name={brand.logo} style={brand.logoStyle} />
+                  <BrandMark id={brand.id} />
                   <div className="resumen-brand-row__info">
                     <strong>{brand.name}</strong>
                     <span>{brand.revenue}</span>
@@ -168,8 +164,7 @@ export function ResumenDashboard() {
                 </li>
               ))}
             </ul>
-          </section>
-        </div>
+        </section>
       </div>
     </div>
   )
