@@ -71,8 +71,14 @@ function CatalogImage({ src, alt, className }: { src: string; alt: string; class
 
 export function CatalogView({ onNavigate }: CatalogViewProps) {
   const [search, setSearch] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState(catalogCategoryFilterOptions[0])
-  const [brandFilter, setBrandFilter] = useState(catalogBrandFilterOptions[0])
+
+  const [categoryFilter, setCategoryFilter] = useState<string>(
+    catalogCategoryFilterOptions[0]
+  )
+  
+  const [brandFilter, setBrandFilter] = useState<string>(
+    catalogBrandFilterOptions[0]
+  )
 
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase()
