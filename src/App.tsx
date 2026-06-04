@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2, BarChart3, Boxes, Building2, User, ShieldPlus, CircleHelp } from 'lucide-react'
+import { CatalogView } from './components/catalog/CatalogView'
 import { ResumenView } from './components/resumen/ResumenView'
 import { LoginScreen } from './components/LoginScreen'
 import { MetricCard } from './components/MetricCard'
@@ -97,11 +98,6 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  useEffect(() => {
-    if (activeView !== 'catalogo' && productView === 'create') {
-      setProductView('list')
-    }
-  }, [activeView, productView])
 
   useEffect(() => {
     writeStorage(suppliersKey, suppliers)
@@ -673,18 +669,37 @@ export default function App() {
         </section>
         ) : null}
 
-        {activeView === 'catalogo' || activeView === 'inventario' ? (
-        <section className="content-stack dashboard-view" id={activeView}>
+        {activeView === 'catalogo' ? (
+          <CatalogView
+            onNavigate={(section) => {
+              const map: Record<string, DashboardView> = {
+                Catálogo: 'catalogo',
+                Marcas: 'marcas',
+                Proveedores: 'proveedores',
+                Inventario: 'inventario',
+                Ventas: 'ventas',
+                Reportes: 'reportes',
+                'IA BX7': 'predicciones',
+                Empresas: 'empresas',
+              }
+              const view = map[section]
+              if (view) handleNavigate(view)
+            }}
+          />
+        ) : null}
+
+        {activeView === 'inventario' ? (
+        <section className="content-stack dashboard-view" id="inventario">
           <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <div className="panel-head">
               <div>
-                <p className="eyebrow">{activeView === 'catalogo' ? 'BX7 catálogo' : 'BX7 inventario'}</p>
-                <h2>{activeView === 'catalogo' ? 'Catálogo de productos' : 'Control de inventario'}</h2>
+                <p className="eyebrow">BX7 inventario</p>
+                <h2>Control de inventario</h2>
               </div>
-              {activeView === 'catalogo' ? <Package size={18} /> : <AlertTriangle size={18} />}
+              <AlertTriangle size={18} />
             </div>
 
-            {activeView === 'inventario' && stockAlerts.length > 0 ? (
+            {stockAlerts.length > 0 ? (
               <div className="alert-list" style={{ marginBottom: 16 }}>
                 {stockAlerts.map((product) => (
                   <div className="alert-item" key={`alert-${product.id}-${product.sku}`}>
@@ -723,16 +738,7 @@ export default function App() {
                   <div className="products-actions">
                     <div className="products-tabs">
                       <button type="button" className="tab-button tab-button--active" onClick={() => setProductView('list')}>Lista</button>
-                      {activeView === 'catalogo' ? (
-                        <button type="button" className="tab-button" onClick={() => setProductView('create')}>Alta rápida</button>
-                      ) : null}
                     </div>
-
-                    {activeView === 'catalogo' ? (
-                      <button type="button" className="primary-button add-product-button" onClick={() => setShowProductModal(true)}>
-                        Agregar producto
-                      </button>
-                    ) : null}
                   </div>
                 </div>
 
