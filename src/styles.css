@@ -427,6 +427,24 @@ table select option {
   grid-template-columns: 280px minmax(0, 1fr);
   gap: 24px;
   padding: 24px;
+  transition: grid-template-columns 0.28s ease, gap 0.28s ease;
+}
+
+.app-shell--sidebar-closed {
+  grid-template-columns: 0 minmax(0, 1fr);
+  gap: 0;
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  border: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.58);
+  cursor: pointer;
+  backdrop-filter: blur(2px);
 }
 
 .nav-anchor {
@@ -445,6 +463,15 @@ table select option {
   align-self: start;
   height: auto;
   max-height: none;
+  width: 280px;
+  transition: transform 0.28s ease, opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.app-shell--sidebar-closed .sidebar {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .sidebar-brand {
@@ -589,6 +616,8 @@ table select option {
 .dashboard {
   display: grid;
   gap: 22px;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 .top-nav {
@@ -613,6 +642,26 @@ table select option {
   gap: 14px;
   flex: 1;
   min-width: 0;
+}
+
+.top-nav__menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.top-nav__menu-toggle:hover {
+  background: rgba(255, 90, 31, 0.12);
+  border-color: rgba(255, 140, 0, 0.45);
+  color: #ffb000;
 }
 
 .top-nav__end {
@@ -1001,7 +1050,8 @@ table select option {
 .content-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr);
+  min-width: 0;
 }
 
 .content-stack {
@@ -1122,11 +1172,12 @@ table select option {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 60;
+  z-index: 10050;
+  padding: 16px;
 }
 
 .modal {
@@ -1250,6 +1301,33 @@ table select option {
 
 .chart-box {
   height: 290px;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.product-cell {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.product-cell__copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.inventory-alert-list {
+  margin-bottom: 16px;
 }
 
 .side-panel {
@@ -1330,11 +1408,50 @@ tbody tr:hover {
 @media (max-width: 1200px) {
   .app-shell {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .app-shell--sidebar-closed {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .sidebar-backdrop {
+    display: none;
+  }
+
+  .app-shell--sidebar-open .sidebar-backdrop {
+    display: block;
   }
 
   .sidebar {
-    position: static;
-    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10001;
+    width: min(288px, 88vw);
+    max-height: 100vh;
+    overflow-y: auto;
+    border-radius: 0 28px 28px 0;
+    transform: translateX(calc(-100% - 24px));
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    box-shadow: 24px 0 48px rgba(0, 0, 0, 0.45);
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  .app-shell--sidebar-closed .sidebar {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  body.sidebar-drawer-open {
+    overflow: hidden;
   }
 
   .metrics-grid,
@@ -1388,7 +1505,7 @@ tbody tr:hover {
 @media (max-width: 720px) {
   .app-shell,
   .login-shell {
-    padding: 16px;
+    padding: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom));
     gap: 16px;
   }
 
@@ -1440,4 +1557,167 @@ tbody tr:hover {
 .hero-stats .metric-icon svg {
   width: 28px !important;
   height: 28px !important;
+}
+
+/* ===== Responsive: tablets & phones ===== */
+
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    flex-wrap: wrap;
+  }
+
+  .metric-card {
+    flex: 1 1 calc(50% - 9px);
+    min-width: min(100%, 240px);
+  }
+
+  .panel,
+  .hero-card {
+    padding: 20px;
+  }
+
+  .login-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .primary-button,
+  .form-actions .ghost-button {
+    width: 100%;
+  }
+
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .chart-box {
+    height: 240px;
+  }
+
+  .metric-card strong {
+    font-size: 1.55rem;
+  }
+
+  .table-wrap th,
+  .table-wrap td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .table-actions .ghost-button {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
+
+  .product-thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .panel-head input,
+  .panel-head select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-nav__erp-pill {
+    display: none;
+  }
+
+  .top-nav {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .top-nav__menu-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .top-nav__start {
+    gap: 10px;
+  }
+
+  .products-stats {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .product-stat {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+
+  .add-product-button {
+    width: 100%;
+  }
+
+  .products-actions {
+    flex-wrap: wrap;
+  }
+
+  .metric-card {
+    flex: 1 1 100%;
+  }
+
+  .login-visual {
+    padding: 24px 18px;
+    min-height: auto;
+  }
+
+  .login-card {
+    padding: 24px 18px;
+  }
+
+  .login-visual .glow {
+    display: none;
+  }
+
+  .eyebrow {
+    letter-spacing: 0.1em;
+    font-size: 0.68rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

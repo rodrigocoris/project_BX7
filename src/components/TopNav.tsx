@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Bell, ChevronDown, LogOut, Search, User } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, Menu, Search, User, X } from 'lucide-react'
 import type { SessionUser } from '../types'
 import { Bx7NavLogo } from './Bx7NavLogo'
 
@@ -8,9 +8,11 @@ type TopNavProps = {
   searchValue: string
   onSearchChange: (value: string) => void
   onLogout: () => void
+  sidebarOpen: boolean
+  onMenuToggle: () => void
 }
 
-export function TopNav({ user, searchValue, onSearchChange, onLogout }: TopNavProps) {
+export function TopNav({ user, searchValue, onSearchChange, onLogout, sidebarOpen, onMenuToggle }: TopNavProps) {
   const searchRef = useRef<HTMLInputElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -48,6 +50,17 @@ export function TopNav({ user, searchValue, onSearchChange, onLogout }: TopNavPr
   return (
     <nav className="top-nav" aria-label="Navegación principal">
       <div className="top-nav__start">
+        <button
+          type="button"
+          className="top-nav__menu-toggle"
+          onClick={onMenuToggle}
+          aria-expanded={sidebarOpen}
+          aria-controls="app-sidebar"
+          aria-label={sidebarOpen ? 'Cerrar menú lateral' : 'Abrir menú lateral'}
+        >
+          {sidebarOpen ? <X size={20} strokeWidth={2.25} /> : <Menu size={20} strokeWidth={2.25} />}
+        </button>
+
         <Bx7NavLogo />
         <span className="top-nav__erp-pill">BX7 ERP</span>
 

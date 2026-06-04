@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="Amortiguadores y coilovers">
+  <rect width="640" height="420" fill="#050505"/>
+  <g transform="translate(120 330) rotate(-18)">
+    <rect x="-14" y="-250" width="28" height="250" rx="8" fill="#1a1a1a" stroke="#333"/>
+    <path d="M-22 0 Q0 -18 22 0 L18 40 Q0 28 -18 40 Z" fill="#222"/>
+    <rect x="-10" y="-230" width="20" height="180" fill="none" stroke="#ff8c00" stroke-width="5"/>
+    <circle cx="0" cy="-248" r="12" fill="#444"/>
+  </g>
+  <g transform="translate(310 340) rotate(-8)">
+    <rect x="-16" y="-280" width="32" height="280" rx="8" fill="#111" stroke="#2a2a2a"/>
+    <rect x="-12" y="-250" width="24" height="210" fill="none" stroke="#111" stroke-width="8"/>
+    <path d="M-12 -250 C-12 -180 -12 -120 -12 -60" fill="none" stroke="#ff8c00" stroke-width="6"/>
+    <rect x="-8" y="-255" width="16" height="200" fill="none" stroke="#ff8c00" stroke-width="4" stroke-dasharray="0"/>
+    <ellipse cx="0" cy="-120" rx="14" ry="90" fill="none" stroke="#ff8c00" stroke-width="5"/>
+    <circle cx="0" cy="-278" r="14" fill="#555"/>
+    <rect x="-6" y="-200" width="12" height="8" fill="#888"/>
+  </g>
+  <g transform="translate(500 320) rotate(6)">
+    <rect x="-15" y="-260" width="30" height="260" rx="8" fill="#0d0d0d" stroke="#2a2a2a"/>
+    <rect x="-11" y="-240" width="22" height="200" fill="none" stroke="#222" stroke-width="6"/>
+    <path d="M-10 -240 Q10 -160 10 -80 Q10 -20 -10 20" fill="none" stroke="#333" stroke-width="5"/>
+    <circle cx="0" cy="-258" r="13" fill="#666"/>
+    <rect x="-20" y="-30" width="40" height="24" rx="4" fill="#1a1a1a" stroke="#444"/>
+  </g>
+</svg>

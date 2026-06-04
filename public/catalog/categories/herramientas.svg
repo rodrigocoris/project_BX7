@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="Maletín de herramientas">
+  <rect width="640" height="420" fill="#050505"/>
+  <g transform="translate(320 220)">
+    <rect x="-200" y="-30" width="400" height="160" rx="12" fill="#111" stroke="#222" stroke-width="3"/>
+    <rect x="-190" y="-120" width="380" height="95" rx="10" fill="#0a0a0a" stroke="#333" stroke-width="2"/>
+    <path d="M-200 -30 L-200 130 Q-200 150 -180 150 L180 150 Q200 150 200 130 L200 -30 Z" fill="#141414" stroke="#2a2a2a"/>
+    <rect x="-170" y="-105" width="340" height="70" rx="6" fill="#0d0d0d"/>
+    <g fill="#888" stroke="#aaa" stroke-width="0.8">
+      <rect x="-150" y="-95" width="55" height="12" rx="2" fill="#666"/>
+      <rect x="-80" y="-95" width="40" height="12" rx="2"/>
+      <rect x="-30" y="-95" width="40" height="12" rx="2"/>
+      <rect x="20" y="-95" width="40" height="12" rx="2"/>
+      <rect x="70" y="-95" width="40" height="12" rx="2"/>
+      <rect x="120" y="-95" width="40" height="12" rx="2"/>
+      <circle cx="-120" cy="-55" r="16" fill="none" stroke="#999" stroke-width="3"/>
+      <rect x="-60" y="-70" width="80" height="8" rx="2" transform="rotate(15 -20 -66)"/>
+      <rect x="40" y="-68" width="60" height="6" rx="2"/>
+      <rect x="110" y="-72" width="8" height="30" rx="2"/>
+    </g>
+    <rect x="-160" y="10" width="320" height="8" fill="#222"/>
+    <rect x="-140" y="30" width="280" height="60" rx="4" fill="#0a0a0a" stroke="#333"/>
+    <g fill="#777">
+      <circle cx="-90" cy="55" r="10"/><circle cx="-40" cy="55" r="10"/><circle cx="10" cy="55" r="10"/>
+      <circle cx="60" cy="55" r="10"/><circle cx="110" cy="55" r="10"/>
+    </g>
+    <rect x="-30" y="125" width="60" height="14" rx="4" fill="#222" stroke="#444"/>
+  </g>
+</svg>

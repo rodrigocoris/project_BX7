@@ -83,6 +83,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<DashboardView>(
     () => viewFromHash(window.location.hash) ?? 'resumen',
   )
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.matchMedia('(min-width: 1201px)').matches)
 
   useEffect(() => {
     writeStorage(sessionKey, user)
@@ -96,6 +97,22 @@ export default function App() {
 
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
+  useEffect(() => {
+    document.body.classList.toggle('sidebar-drawer-open', sidebarOpen && window.matchMedia('(max-width: 1200px)').matches)
+    return () => document.body.classList.remove('sidebar-drawer-open')
+  }, [sidebarOpen])
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 1200px)')
+
+    function handleViewportChange(event: MediaQueryListEvent) {
+      setSidebarOpen(!event.matches)
+    }
+
+    media.addEventListener('change', handleViewportChange)
+    return () => media.removeEventListener('change', handleViewportChange)
   }, [])
 
 
@@ -300,6 +317,13 @@ export default function App() {
       window.location.hash = hashFromView(view)
     }
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (window.matchMedia('(max-width: 1200px)').matches) {
+      setSidebarOpen(false)
+    }
+  }
+
+  function toggleSidebar() {
+    setSidebarOpen((current) => !current)
   }
 
   if (!user) {
@@ -307,11 +331,26 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      <Sidebar activeView={activeView} onNavigate={handleNavigate} />
+    <div className={`app-shell${sidebarOpen ? ' app-shell--sidebar-open' : ' app-shell--sidebar-closed'}`}>
+      <button
+        type="button"
+        className="sidebar-backdrop"
+        aria-label="Cerrar menú lateral"
+        tabIndex={sidebarOpen ? 0 : -1}
+        onClick={() => setSidebarOpen(false)}
+      />
+
+      <Sidebar activeView={activeView} isOpen={sidebarOpen} onNavigate={handleNavigate} />
 
       <main className="dashboard">
-        <TopNav user={user} searchValue={navSearch} onSearchChange={setNavSearch} onLogout={handleLogout} />
+        <TopNav
+          user={user}
+          searchValue={navSearch}
+          onSearchChange={setNavSearch}
+          onLogout={handleLogout}
+          sidebarOpen={sidebarOpen}
+          onMenuToggle={toggleSidebar}
+        />
 
         {activeView === 'resumen' ? (
           <ResumenView
@@ -700,7 +739,7 @@ export default function App() {
             </div>
 
             {stockAlerts.length > 0 ? (
-              <div className="alert-list" style={{ marginBottom: 16 }}>
+              <div className="alert-list inventory-alert-list">
                 {stockAlerts.map((product) => (
                   <div className="alert-item" key={`alert-${product.id}-${product.sku}`}>
                     <div>
@@ -845,9 +884,9 @@ export default function App() {
                       {tableProducts.map((product) => (
                         <tr key={`${product.id}-${product.sku}`} className={getProductRowClass(product)}>
                           <td>
-                            <div style={{display: 'flex', gap: 12, alignItems: 'center'}}>
+                            <div className="product-cell">
                               <img src={product.image || '/930.jpg'} alt={product.name} className="product-thumb" />
-                              <div>
+                              <div className="product-cell__copy">
                                 <strong>{product.name}</strong>
                                 <span>{product.sku} · {product.category}</span>
                               </div>
@@ -859,7 +898,7 @@ export default function App() {
                           </td>
                           <td>{formatCurrencyMXN(product.price)}</td>
                           <td>
-                            <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
+                            <div className="table-actions">
                               <button type="button" className="icon-button" title="Editar" onClick={() => handleEditProduct(product.id)}>
                                 <Edit2 size={16} />
                               </button>

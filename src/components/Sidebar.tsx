@@ -17,6 +17,7 @@ import { Bx7Brand } from './Bx7Brand'
 
 type SidebarProps = {
   activeView: DashboardView
+  isOpen: boolean
   onNavigate: (view: DashboardView) => void
 }
 
@@ -34,9 +35,9 @@ const navigation: { label: string; view: DashboardView; icon: typeof LayoutGrid 
   { label: 'Configuración', view: 'configuracion', icon: Settings },
 ]
 
-export function Sidebar({ activeView, onNavigate }: SidebarProps) {
+export function Sidebar({ activeView, isOpen, onNavigate }: SidebarProps) {
   return (
-    <aside className="sidebar">
+    <aside id="app-sidebar" className={`sidebar${isOpen ? ' sidebar--open' : ''}`} aria-hidden={!isOpen}>
       <div className="sidebar-brand">
         <Bx7Brand showText={false} compact className="sidebar-banner" />
       </div>
