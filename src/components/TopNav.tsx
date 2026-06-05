@@ -13,9 +13,33 @@ type TopNavProps = {
 }
 
 export function TopNav({ user, searchValue, onSearchChange, onLogout, sidebarOpen, onMenuToggle }: TopNavProps) {
+  const navRef = useRef<HTMLElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const [profileOpen, setProfileOpen] = useState(false)
+
+  useEffect(() => {
+    const nav = navRef.current
+    if (!nav) return
+
+    function syncNavOffset() {
+      if (!nav) return
+      const { bottom } = nav.getBoundingClientRect()
+      document.documentElement.style.setProperty('--mobile-top-nav-height', `${Math.ceil(bottom)}px`)
+    }
+
+    syncNavOffset()
+
+    const observer = new ResizeObserver(syncNavOffset)
+    observer.observe(nav)
+    window.addEventListener('resize', syncNavOffset)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', syncNavOffset)
+      document.documentElement.style.removeProperty('--mobile-top-nav-height')
+    }
+  }, [])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -48,7 +72,7 @@ export function TopNav({ user, searchValue, onSearchChange, onLogout, sidebarOpe
   }
 
   return (
-    <nav className="top-nav" aria-label="Navegación principal">
+    <nav ref={navRef} className="top-nav" aria-label="Navegación principal">
       <div className="top-nav__start">
         <button
           type="button"

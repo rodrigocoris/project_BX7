@@ -1,18 +1,9 @@
+import { BX7_LOGO_SRC } from '../../constants/brandAssets'
+
 export function Bx7WheelsMark() {
   return (
     <span className="own-brand-logo own-brand-logo--bx7-wheels" aria-hidden="true">
-      <svg viewBox="0 0 52 52" role="presentation" focusable="false">
-        <circle cx="26" cy="26" r="26" fill="#080808" />
-        <path d="M15 12h6l-6 6h-6l6-6Z" fill="#ff2a1a" />
-        <path d="M21 12h5l-5 6h-5l5-6Z" fill="#ff7a00" />
-        <path d="M26 12h5l-5 6h-5l5-6Z" fill="#ffba00" />
-        <text x="11" y="36" fill="#ffffff" fontFamily="Arial Black, Arial, sans-serif" fontSize="11" fontWeight="900">
-          BX
-        </text>
-        <text x="30" y="36" fill="#ff7a00" fontFamily="Arial Black, Arial, sans-serif" fontSize="11" fontWeight="900">
-          7
-        </text>
-      </svg>
+      <img src={BX7_LOGO_SRC} alt="" />
     </span>
   )
 }

@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { BX7_LOGO_SRC } from '../../constants/brandAssets'
 
 /** Logos vectoriales compartidos (Marcas distribuidas y Marcas principales). */
 
@@ -122,18 +123,7 @@ export function VossenMark() {
 export function Bx7WheelsMark() {
   return (
     <span className="distributed-brand-logo distributed-brand-logo--bx7" aria-hidden="true">
-      <svg viewBox="0 0 40 40" role="presentation" focusable="false">
-        <rect width="40" height="40" rx="8" fill="#080808" />
-        <path d="M12 10h5L11 15H8l4-5Z" fill="#ff2a1a" />
-        <path d="M17 10h4L16 15H13l4-5Z" fill="#ff7a00" />
-        <path d="M21 10h4L20 15H17l4-5Z" fill="#ffba00" />
-        <text x="9" y="28" fill="#ffffff" fontFamily="Arial Black, Arial, sans-serif" fontSize="9" fontWeight="900">
-          BX
-        </text>
-        <text x="23" y="28" fill="#ff7a00" fontFamily="Arial Black, Arial, sans-serif" fontSize="9" fontWeight="900">
-          7
-        </text>
-      </svg>
+      <img src={BX7_LOGO_SRC} alt="" />
     </span>
   )
 }

@@ -322,15 +322,14 @@
   overflow: hidden;
 }
 
-.catalog-brand-logo__bx7 .bx7-brand__mark svg {
-  width: 44px;
-  height: auto;
-}
-
 .catalog-brand-logo__img {
   width: 36px;
   height: auto;
   object-fit: contain;
+}
+
+.catalog-brand-logo__img--bx7 {
+  width: 44px;
 }
 
 .catalog-brand-logo--mark .distributed-brand-logo {
@@ -509,6 +508,17 @@
 }
 
 @media (max-width: 640px) {
+  .catalog-view {
+    gap: 18px;
+  }
+
+  .catalog-panel,
+  .catalog-cat-card,
+  .catalog-brand-card,
+  .catalog-product-card {
+    min-width: 0;
+  }
+
   .catalog-categories-grid,
   .catalog-brands-grid,
   .catalog-products-grid,

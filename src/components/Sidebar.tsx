@@ -11,6 +11,7 @@ import {
   Sparkles,
   Star,
   Users,
+  X,
 } from 'lucide-react'
 import type { DashboardView } from '../types/dashboard'
 import { Bx7Brand } from './Bx7Brand'
@@ -19,6 +20,7 @@ type SidebarProps = {
   activeView: DashboardView
   isOpen: boolean
   onNavigate: (view: DashboardView) => void
+  onClose: () => void
 }
 
 const navigation: { label: string; view: DashboardView; icon: typeof LayoutGrid }[] = [
@@ -35,11 +37,19 @@ const navigation: { label: string; view: DashboardView; icon: typeof LayoutGrid 
   { label: 'Configuración', view: 'configuracion', icon: Settings },
 ]
 
-export function Sidebar({ activeView, isOpen, onNavigate }: SidebarProps) {
+export function Sidebar({ activeView, isOpen, onNavigate, onClose }: SidebarProps) {
   return (
     <aside id="app-sidebar" className={`sidebar${isOpen ? ' sidebar--open' : ''}`} aria-hidden={!isOpen}>
       <div className="sidebar-brand">
         <Bx7Brand showText={false} compact className="sidebar-banner" />
+        <button
+          type="button"
+          className="sidebar__close"
+          onClick={onClose}
+          aria-label="Cerrar menú lateral"
+        >
+          <X size={20} strokeWidth={2.25} />
+        </button>
       </div>
 
       <nav className="sidebar-nav" aria-label="Menú principal">

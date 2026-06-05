@@ -4,7 +4,7 @@ export const ownBrands = [
     id: 'bx7-wheels',
     name: 'BX7 Wheels',
     description: 'Rines de alto rendimiento',
-    logoSrc: '/brands/bx7-wheels-logo.svg',
+    logoSrc: '/brands/bx7-logo.png',
     logoAlt: 'Logo BX7 Wheels',
   },
   {

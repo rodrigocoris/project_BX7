@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { resumenActivities, resumenChartData, resumenKpis, resumenTopBrands } from '../../data/resumenData'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { BrandMark } from './DistributedBrandMarks'
 
 function KpiIcon({ icon, tone }: { icon: string; tone: string }) {
@@ -44,6 +45,9 @@ function ActivityIcon({ icon, tone }: { icon: string; tone: string }) {
 }
 
 export function ResumenDashboard() {
+  const isCompactPhone = useMediaQuery('(max-width: 480px)')
+  const isMobile = useMediaQuery('(max-width: 768px)')
+
   return (
     <div className="resumen-dashboard">
       <section className="resumen-panel resumen-kpis-section" aria-labelledby="resumen-general-title">
@@ -86,16 +90,31 @@ export function ResumenDashboard() {
           </div>
 
           <div className="resumen-chart-box">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={resumenChartData}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={resumenChartData}
+                margin={{
+                  top: 8,
+                  right: isCompactPhone ? 4 : 12,
+                  left: isCompactPhone ? -12 : -4,
+                  bottom: isMobile ? 4 : 0,
+                }}
+              >
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="day" stroke="rgba(255,255,255,0.45)" tick={{ fontSize: 11 }} />
+                <XAxis
+                  dataKey="day"
+                  stroke="rgba(255,255,255,0.45)"
+                  tick={{ fontSize: isCompactPhone ? 9 : 11 }}
+                  interval={isCompactPhone ? 1 : 0}
+                  tickMargin={8}
+                />
                 <YAxis
                   stroke="rgba(255,255,255,0.45)"
-                  tick={{ fontSize: 11 }}
-                  tickFormatter={(value) => `$${value}M`}
+                  tick={{ fontSize: isCompactPhone ? 9 : 11 }}
+                  tickFormatter={(value) => (isCompactPhone ? `$${value}` : `$${value}M`)}
                   domain={[0, 30]}
-                  ticks={[0, 10, 20, 30]}
+                  ticks={isCompactPhone ? [0, 30] : [0, 10, 20, 30]}
+                  width={isCompactPhone ? 32 : 44}
                 />
                 <Tooltip
                   contentStyle={{

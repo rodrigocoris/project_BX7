@@ -105,6 +105,19 @@ export default function App() {
   }, [sidebarOpen])
 
   useEffect(() => {
+    if (!sidebarOpen) return
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setSidebarOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [sidebarOpen])
+
+  useEffect(() => {
     const media = window.matchMedia('(max-width: 1200px)')
 
     function handleViewportChange(event: MediaQueryListEvent) {
@@ -326,6 +339,10 @@ export default function App() {
     setSidebarOpen((current) => !current)
   }
 
+  function closeSidebar() {
+    setSidebarOpen(false)
+  }
+
   if (!user) {
     return <LoginScreen onLogin={handleLogin} error={loginError} />
   }
@@ -336,11 +353,10 @@ export default function App() {
         type="button"
         className="sidebar-backdrop"
         aria-label="Cerrar menú lateral"
+        aria-hidden={!sidebarOpen}
         tabIndex={sidebarOpen ? 0 : -1}
-        onClick={() => setSidebarOpen(false)}
+        onClick={closeSidebar}
       />
-
-      <Sidebar activeView={activeView} isOpen={sidebarOpen} onNavigate={handleNavigate} />
 
       <main className="dashboard">
         <TopNav
@@ -1168,6 +1184,8 @@ export default function App() {
         </section>
         ) : null}
       </main>
+
+      <Sidebar activeView={activeView} isOpen={sidebarOpen} onNavigate={handleNavigate} onClose={closeSidebar} />
     </div>
   )
 }

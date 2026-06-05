@@ -1,4 +1,4 @@
-import { Bx7Brand } from '../Bx7Brand'
+import { BX7_LOGO_SRC } from '../../constants/brandAssets'
 import { DobinsonsMark, EibachMark, FoxMark, KcHilitesMark } from '../resumen/DistributedBrandMarks'
 
 type CatalogBrandLogoProps = {
@@ -10,7 +10,7 @@ export function CatalogBrandLogo({ logoType, name }: CatalogBrandLogoProps) {
   if (logoType === 'bx7') {
     return (
       <span className="catalog-brand-logo">
-        <Bx7Brand showText={false} compact className="catalog-brand-logo__bx7" />
+        <img src={BX7_LOGO_SRC} alt={name} className="catalog-brand-logo__img catalog-brand-logo__img--bx7" />
       </span>
     )
   }
