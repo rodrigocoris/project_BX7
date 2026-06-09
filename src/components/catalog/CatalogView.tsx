@@ -24,7 +24,6 @@ import {
   catalogPopularProducts,
 } from '../../data/catalogData'
 import { CatalogBrandLogo } from './CatalogBrandLogo'
-import { CatalogSubNav } from './CatalogSubNav'
 import '../../styles/catalog.css'
 
 const categoryIcons = {
@@ -43,10 +42,6 @@ const footerIcons = {
   truck: Truck,
   headphones: Headphones,
 } as const
-
-type CatalogViewProps = {
-  onNavigate?: (section: string) => void
-}
 
 function formatPriceMXN(amount: number) {
   return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount)
@@ -69,7 +64,7 @@ function CatalogImage({ src, alt, className }: { src: string; alt: string; class
   )
 }
 
-export function CatalogView({ onNavigate }: CatalogViewProps) {
+export function CatalogView() {
   const [search, setSearch] = useState('')
 
   const [categoryFilter, setCategoryFilter] = useState<string>(
@@ -94,8 +89,6 @@ export function CatalogView({ onNavigate }: CatalogViewProps) {
 
   return (
     <section className="catalog-view dashboard-view" id="catalogo">
-      <CatalogSubNav onNavigate={onNavigate} />
-
       <header className="catalog-header">
         <div className="catalog-header__copy">
           <h1 className="catalog-header__title">Catálogo</h1>

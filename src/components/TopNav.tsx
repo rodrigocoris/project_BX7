@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type RefObject } from 'react'
 import { Bell, ChevronDown, LogOut, Menu, Search, User, X } from 'lucide-react'
 import type { SessionUser } from '../types'
 import { Bx7NavLogo } from './Bx7NavLogo'
@@ -10,28 +10,40 @@ type TopNavProps = {
   onLogout: () => void
   sidebarOpen: boolean
   onMenuToggle: () => void
+  onHomeClick?: () => void
+  layoutRootRef?: RefObject<HTMLElement | null>
 }
 
-export function TopNav({ user, searchValue, onSearchChange, onLogout, sidebarOpen, onMenuToggle }: TopNavProps) {
+export function TopNav({
+  user,
+  searchValue,
+  onSearchChange,
+  onLogout,
+  sidebarOpen,
+  onMenuToggle,
+  onHomeClick,
+  layoutRootRef,
+}: TopNavProps) {
   const navRef = useRef<HTMLElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const [profileOpen, setProfileOpen] = useState(false)
 
   useEffect(() => {
-    const nav = navRef.current
-    if (!nav) return
+    const layoutRoot = layoutRootRef?.current ?? navRef.current
+    if (!layoutRoot) return
 
     function syncNavOffset() {
-      if (!nav) return
-      const { bottom } = nav.getBoundingClientRect()
+      const root = layoutRootRef?.current ?? navRef.current
+      if (!root) return
+      const { bottom } = root.getBoundingClientRect()
       document.documentElement.style.setProperty('--mobile-top-nav-height', `${Math.ceil(bottom)}px`)
     }
 
     syncNavOffset()
 
     const observer = new ResizeObserver(syncNavOffset)
-    observer.observe(nav)
+    observer.observe(layoutRoot)
     window.addEventListener('resize', syncNavOffset)
 
     return () => {
@@ -39,7 +51,7 @@ export function TopNav({ user, searchValue, onSearchChange, onLogout, sidebarOpe
       window.removeEventListener('resize', syncNavOffset)
       document.documentElement.style.removeProperty('--mobile-top-nav-height')
     }
-  }, [])
+  }, [layoutRootRef])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -85,7 +97,7 @@ export function TopNav({ user, searchValue, onSearchChange, onLogout, sidebarOpe
           {sidebarOpen ? <X size={20} strokeWidth={2.25} /> : <Menu size={20} strokeWidth={2.25} />}
         </button>
 
-        <Bx7NavLogo />
+        <Bx7NavLogo onClick={onHomeClick} />
         <span className="top-nav__erp-pill">BX7 ERP</span>
 
         <form className="top-nav__search" role="search" onSubmit={handleSearchSubmit}>

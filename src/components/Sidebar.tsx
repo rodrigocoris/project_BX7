@@ -1,18 +1,5 @@
-import {
-  BarChart3,
-  BookOpen,
-  Building2,
-  Factory,
-  Headphones,
-  LayoutGrid,
-  Package,
-  Settings,
-  ShoppingCart,
-  Sparkles,
-  Star,
-  Users,
-  X,
-} from 'lucide-react'
+import { Headphones, X } from 'lucide-react'
+import { mainNavigation } from '../data/mainNavigation'
 import type { DashboardView } from '../types/dashboard'
 import { Bx7Brand } from './Bx7Brand'
 
@@ -23,25 +10,18 @@ type SidebarProps = {
   onClose: () => void
 }
 
-const navigation: { label: string; view: DashboardView; icon: typeof LayoutGrid }[] = [
-  { label: 'Resumen', view: 'resumen', icon: LayoutGrid },
-  { label: 'Catálogo', view: 'catalogo', icon: BookOpen },
-  { label: 'Empresas', view: 'empresas', icon: Building2 },
-  { label: 'Marcas', view: 'marcas', icon: Star },
-  { label: 'Proveedores', view: 'proveedores', icon: Factory },
-  { label: 'Inventario', view: 'inventario', icon: Package },
-  { label: 'Ventas', view: 'ventas', icon: ShoppingCart },
-  { label: 'Clientes', view: 'clientes', icon: Users },
-  { label: 'Predicciones IA', view: 'predicciones', icon: Sparkles },
-  { label: 'Reportes', view: 'reportes', icon: BarChart3 },
-  { label: 'Configuración', view: 'configuracion', icon: Settings },
-]
-
 export function Sidebar({ activeView, isOpen, onNavigate, onClose }: SidebarProps) {
   return (
     <aside id="app-sidebar" className={`sidebar${isOpen ? ' sidebar--open' : ''}`} aria-hidden={!isOpen}>
       <div className="sidebar-brand">
-        <Bx7Brand showText={false} compact className="sidebar-banner" />
+        <button
+          type="button"
+          className="sidebar-brand__home"
+          onClick={() => onNavigate('resumen')}
+          aria-label="Ir a inicio"
+        >
+          <Bx7Brand showText={false} compact className="sidebar-banner" />
+        </button>
         <button
           type="button"
           className="sidebar__close"
@@ -53,7 +33,7 @@ export function Sidebar({ activeView, isOpen, onNavigate, onClose }: SidebarProp
       </div>
 
       <nav className="sidebar-nav" aria-label="Menú principal">
-        {navigation.map((item) => {
+        {mainNavigation.map((item) => {
           const Icon = item.icon
           const isActive = activeView === item.view
 

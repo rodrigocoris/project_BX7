@@ -74,14 +74,3 @@ export const businessUnits = [
   { label: 'Importación', description: 'Gestión de importaciones', icon: 'import' as const },
   { label: 'Marketing', description: 'Marca y estrategia', icon: 'megaphone' as const },
 ] as const
-
-export const resumenSubNavItems = [
-  'Empresas',
-  'Catálogo',
-  'Marcas',
-  'Proveedores',
-  'Inventario',
-  'Ventas',
-  'Reportes',
-  'IA BX7',
-] as const

@@ -486,6 +486,26 @@ table select option {
   width: 100%;
 }
 
+.sidebar-brand__home {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 16px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-brand__home:hover {
+  opacity: 0.92;
+}
+
+.sidebar-brand__home:focus-visible {
+  outline: 2px solid rgba(255, 140, 0, 0.55);
+  outline-offset: 3px;
+}
+
 .sidebar__close {
   display: none;
   position: absolute;
@@ -652,6 +672,24 @@ table select option {
   z-index: 1;
 }
 
+.dashboard-header {
+  display: grid;
+  gap: 0;
+  position: sticky;
+  top: calc(var(--brand-bar-height) + 12px);
+  z-index: 200;
+  min-width: 0;
+}
+
+.dashboard-header .resumen-subnav-wrap {
+  margin-bottom: 0;
+}
+
+.dashboard-header .top-nav {
+  position: relative;
+  top: auto;
+}
+
 .dashboard-view {
   min-width: 0;
   width: 100%;
@@ -719,6 +757,24 @@ table select option {
   width: 100%;
   height: auto;
   object-fit: contain;
+}
+
+.top-nav__logo-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.top-nav__logo-btn:hover {
+  opacity: 0.88;
+}
+
+.top-nav__logo-btn:focus-visible {
+  outline: 2px solid rgba(255, 140, 0, 0.55);
+  outline-offset: 2px;
 }
 
 .top-nav__erp-pill {
@@ -1488,10 +1544,15 @@ tbody tr:hover {
     padding-right: 48px;
   }
 
-  .top-nav {
-    z-index: 10003;
-    position: sticky;
+  .dashboard-header {
     top: calc(var(--brand-bar-height) + 8px);
+    z-index: 10003;
+  }
+
+  .top-nav {
+    z-index: auto;
+    position: relative;
+    top: auto;
   }
 
   .sidebar {

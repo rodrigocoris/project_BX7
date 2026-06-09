@@ -1,0 +1,222 @@
+.empresas-view {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+
+.empresas-header__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.empresas-header__subtitle {
+  margin: 8px 0 0;
+  max-width: 640px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.empresas-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.empresas-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18, 18, 18, 0.95);
+}
+
+.empresas-stat__icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.empresas-stat__icon--own {
+  background: rgba(255, 90, 31, 0.18);
+  color: #ff8c00;
+}
+
+.empresas-stat__icon--distributed {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+}
+
+.empresas-stat__icon--total {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+}
+
+.empresas-stat__copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.empresas-stat__copy strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.empresas-stat__copy span {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.empresas-section__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.empresas-section__head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.empresas-section__count {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.empresas-brands-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.empresas-brand-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.empresas-brand-card:hover {
+  border-color: rgba(255, 140, 0, 0.28);
+  background: rgba(255, 90, 31, 0.06);
+}
+
+.empresas-brand-card__logo {
+  width: 64px;
+  height: 52px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #050505;
+  overflow: hidden;
+}
+
+.empresas-brand-card__logo .own-brand-logo,
+.empresas-brand-card__logo .distributed-brand-logo {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empresas-brand-card__logo .own-brand-logo--bx7-wheels {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+}
+
+.empresas-brand-card__logo .own-brand-logo--teix {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+}
+
+.empresas-brand-card__logo .distributed-brand-logo svg,
+.empresas-brand-card__logo .distributed-brand-logo img {
+  width: 44px;
+  height: 44px;
+}
+
+.empresas-brand-card__copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.empresas-brand-card__copy strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.empresas-brand-card__copy span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.empresas-brand-card__copy small {
+  font-size: 0.72rem;
+  color: rgba(255, 140, 0, 0.85);
+}
+
+@media (max-width: 1024px) {
+  .empresas-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .empresas-brands-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .empresas-brands-grid,
+  .empresas-brands-grid--distributed {
+    grid-template-columns: 1fr;
+  }
+
+  .empresas-section__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .empresas-section__count {
+    align-self: flex-start;
+  }
+}

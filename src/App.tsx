@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, ArrowUpRight, CalendarDays, Coins, LineChart, Package, PanelLeft, ShieldCheck, Truck, Edit2, Copy, Trash2, BarChart3, Boxes, Building2, User, ShieldPlus, CircleHelp } from 'lucide-react'
 import { CatalogView } from './components/catalog/CatalogView'
+import { EmpresasView } from './components/empresas/EmpresasView'
 import { ResumenView } from './components/resumen/ResumenView'
+import { ResumenSubNav } from './components/resumen/ResumenSubNav'
 import { LoginScreen } from './components/LoginScreen'
 import { MetricCard } from './components/MetricCard'
 import { Sidebar } from './components/Sidebar'
@@ -84,6 +86,7 @@ export default function App() {
     () => viewFromHash(window.location.hash) ?? 'resumen',
   )
   const [sidebarOpen, setSidebarOpen] = useState(() => window.matchMedia('(min-width: 1201px)').matches)
+  const dashboardHeaderRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     writeStorage(sessionKey, user)
@@ -359,32 +362,22 @@ export default function App() {
       />
 
       <main className="dashboard">
-        <TopNav
-          user={user}
-          searchValue={navSearch}
-          onSearchChange={setNavSearch}
-          onLogout={handleLogout}
-          sidebarOpen={sidebarOpen}
-          onMenuToggle={toggleSidebar}
-        />
-
-        {activeView === 'resumen' ? (
-          <ResumenView
-            onSectionNavigate={(section) => {
-              const map: Record<string, DashboardView> = {
-                Catálogo: 'catalogo',
-                Marcas: 'marcas',
-                Proveedores: 'proveedores',
-                Inventario: 'inventario',
-                Ventas: 'ventas',
-                Reportes: 'reportes',
-                'IA BX7': 'predicciones',
-              }
-              const view = map[section]
-              if (view) handleNavigate(view)
-            }}
+        <div ref={dashboardHeaderRef} className="dashboard-header">
+          <TopNav
+            user={user}
+            searchValue={navSearch}
+            onSearchChange={setNavSearch}
+            onLogout={handleLogout}
+            sidebarOpen={sidebarOpen}
+            onMenuToggle={toggleSidebar}
+            onHomeClick={() => handleNavigate('resumen')}
+            layoutRootRef={dashboardHeaderRef}
           />
-        ) : null}
+
+          <ResumenSubNav activeView={activeView} onNavigate={handleNavigate} />
+        </div>
+
+        {activeView === 'resumen' ? <ResumenView /> : null}
 
         {activeView === 'clientes' ? (
         <section className="content-grid two-cols dashboard-view" id="informacion">
@@ -441,88 +434,9 @@ export default function App() {
         </section>
         ) : null}
 
-        {activeView === 'empresas' ? (
-        <section className="content-grid two-cols dashboard-view" id="bx7group">
-          <motion.article className="panel" id="bx7-wheels" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
-            <div className="panel-head">
-              <div>
-                <p className="eyebrow">BX7Group</p>
-                <h2>BX7 Wheels</h2>
-              </div>
-              <Boxes size={18} />
-            </div>
+        {activeView === 'empresas' ? <EmpresasView /> : null}
 
-            <p className="panel-copy">
-              Línea enfocada en rines y accesorios off-road para camionetas 4x4, diseñada para resaltar catálogo y stock operativo.
-            </p>
-
-            <div className="quick-stats">
-              <div>
-                <ShieldCheck size={16} />
-                Catálogo especializado en rines
-              </div>
-              <div>
-                <Truck size={16} />
-                Preparado para flujo de distribución
-              </div>
-            </div>
-          </motion.article>
-
-          <motion.article className="panel" id="teix" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
-            <div className="panel-head">
-              <div>
-                <p className="eyebrow">BX7Group</p>
-                <h2>Teix</h2>
-              </div>
-              <Package size={18} />
-            </div>
-
-            <p className="panel-copy">
-              Submarca para accesorios y complementos con enfoque premium, lista para crecer junto con el inventario BX7.
-            </p>
-
-            <div className="quick-stats">
-              <div>
-                <BarChart3 size={16} />
-                Listo para KPI por categoría
-              </div>
-              <div>
-                <User size={16} />
-                Integrable a futuras tiendas o canales
-              </div>
-            </div>
-          </motion.article>
-        </section>
-        ) : null}
-
-        {activeView === 'marcas' ? (
-        <section className="dashboard-view" id="teix">
-          <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
-            <div className="panel-head">
-              <div>
-                <p className="eyebrow">BX7Group</p>
-                <h2>Teix</h2>
-              </div>
-              <Package size={18} />
-            </div>
-
-            <p className="panel-copy">
-              Submarca para accesorios y complementos con enfoque premium, lista para crecer junto con el inventario BX7.
-            </p>
-
-            <div className="quick-stats">
-              <div>
-                <BarChart3 size={16} />
-                Listo para KPI por categoría
-              </div>
-              <div>
-                <User size={16} />
-                Integrable a futuras tiendas o canales
-              </div>
-            </div>
-          </motion.article>
-        </section>
-        ) : null}
+        {activeView === 'marcas' ? <EmpresasView variant="marcas" /> : null}
 
         {activeView === 'soporte' || activeView === 'configuracion' ? (
         <section className="dashboard-view" id="soporte">
@@ -724,24 +638,7 @@ export default function App() {
         </section>
         ) : null}
 
-        {activeView === 'catalogo' ? (
-          <CatalogView
-            onNavigate={(section) => {
-              const map: Record<string, DashboardView> = {
-                Catálogo: 'catalogo',
-                Marcas: 'marcas',
-                Proveedores: 'proveedores',
-                Inventario: 'inventario',
-                Ventas: 'ventas',
-                Reportes: 'reportes',
-                'IA BX7': 'predicciones',
-                Empresas: 'empresas',
-              }
-              const view = map[section]
-              if (view) handleNavigate(view)
-            }}
-          />
-        ) : null}
+        {activeView === 'catalogo' ? <CatalogView /> : null}
 
         {activeView === 'inventario' ? (
         <section className="content-stack dashboard-view" id="inventario">
