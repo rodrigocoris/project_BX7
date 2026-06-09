@@ -123,7 +123,7 @@ export function VossenMark() {
 export function Bx7WheelsMark() {
   return (
     <span className="distributed-brand-logo distributed-brand-logo--bx7" aria-hidden="true">
-      <img src={BX7_LOGO_SRC} alt="" />
+      <img src="/brands/bx7-wheels-logo.png" alt="" />
     </span>
   )
 }

@@ -3,7 +3,7 @@ import { BX7_LOGO_SRC } from '../../constants/brandAssets'
 export function Bx7WheelsMark() {
   return (
     <span className="own-brand-logo own-brand-logo--bx7-wheels" aria-hidden="true">
-      <img src={BX7_LOGO_SRC} alt="" />
+      <img src="/brands/bx7-wheels-logo.png" alt="" />
     </span>
   )
 }
