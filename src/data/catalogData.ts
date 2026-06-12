@@ -77,7 +77,7 @@ export const catalogPopularProducts = [
     sku: 'BX7-FB17-BK',
     price: 6420,
     stock: 15,
-    image: '/930.jpg',
+    image: '/product-bx7-beadlock.png',
   },
   {
     id: '2',
@@ -86,7 +86,7 @@ export const catalogPopularProducts = [
     sku: 'FOX-25DSC-F150',
     price: 18950,
     stock: 6,
-    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08f3?w=520&h=360&fit=crop&q=80',
+    image: '/product-fox-suspension.png',
   },
   {
     id: '3',
@@ -95,7 +95,7 @@ export const catalogPopularProducts = [
     sku: 'KC-P6-50-BLK',
     price: 12400,
     stock: 8,
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=520&h=360&fit=crop&q=80',
+    image: '/product-kc-lights.png',
   },
   {
     id: '4',
@@ -104,7 +104,7 @@ export const catalogPopularProducts = [
     sku: 'DOB-MRR-TACO',
     price: 24800,
     stock: 3,
-    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=520&h=360&fit=crop&q=80',
+    image: '/product-dobinsons-suspension.png',
   },
   {
     id: '5',
@@ -113,7 +113,7 @@ export const catalogPopularProducts = [
     sku: 'TEIX-CF-TG-F150',
     price: 8900,
     stock: 12,
-    image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=520&h=360&fit=crop&q=80',
+    image: '/product-teix-tailgate.png',
   },
   {
     id: '6',
@@ -122,7 +122,7 @@ export const catalogPopularProducts = [
     sku: 'EIB-PS-25-6x139',
     price: 3280,
     stock: 22,
-    image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=520&h=360&fit=crop&q=80',
+    image: '/product-eibach-spacers.png',
   },
 ] as const
 
