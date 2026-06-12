@@ -14,6 +14,11 @@ import {
   ClipboardList,
   Package,
   BarChart3,
+  CircleDot,
+  Circle,
+  Layers,
+  Lightbulb,
+  Wrench,
 } from 'lucide-react'
 import { mainNavigation } from '../../data/mainNavigation'
 import { distributedBrands } from '../../data/distributedBrands'
@@ -25,7 +30,7 @@ import '../../styles/resumen.css'
 
 type ResumenSubNavProps = {
   activeView: DashboardView
-  onNavigate: (view: DashboardView) => void
+  onNavigate: (view: DashboardView, category?: string) => void
 }
 
 const businessUnitIcons = {
@@ -46,27 +51,30 @@ const quickAccessIcons = {
 
 export function ResumenSubNav({ activeView, onNavigate }: ResumenSubNavProps) {
   const [empresasOpen, setEmpresasOpen] = useState(false)
+  const [catalogoOpen, setCatalogoOpen] = useState(false)
+  
   const dropdownRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const catalogButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    if (!empresasOpen) return
+    if (!empresasOpen && !catalogoOpen) return
 
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(target)
-      ) {
+      const clickedInsideDropdown = dropdownRef.current?.contains(target)
+      const clickedEmpresasBtn = buttonRef.current?.contains(target)
+      const clickedCatalogoBtn = catalogButtonRef.current?.contains(target)
+
+      if (!clickedInsideDropdown && !clickedEmpresasBtn && !clickedCatalogoBtn) {
         setEmpresasOpen(false)
+        setCatalogoOpen(false)
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [empresasOpen])
+  }, [empresasOpen, catalogoOpen])
 
   return (
     <div className="resumen-subnav-wrap">
@@ -74,21 +82,35 @@ export function ResumenSubNav({ activeView, onNavigate }: ResumenSubNavProps) {
         {mainNavigation
           .filter((item) => item.view !== 'resumen' && item.view !== 'configuracion')
           .map((item) => {
-            const isActive = activeView === item.view || (item.view === 'empresas' && empresasOpen)
+            const isActive = activeView === item.view || 
+              (item.view === 'empresas' && empresasOpen) ||
+              (item.view === 'catalogo' && catalogoOpen)
 
             return (
               <button
                 key={item.view}
-                ref={item.view === 'empresas' ? buttonRef : undefined}
+                ref={
+                  item.view === 'empresas'
+                    ? buttonRef
+                    : item.view === 'catalogo'
+                    ? catalogButtonRef
+                    : undefined
+                }
                 type="button"
                 className={`resumen-subnav__item${isActive ? ' resumen-subnav__item--active' : ''}`}
                 aria-current={isActive ? 'page' : undefined}
                 onClick={(event) => {
                   if (item.view === 'empresas') {
                     event.stopPropagation()
+                    setCatalogoOpen(false)
                     setEmpresasOpen((prev) => !prev)
+                  } else if (item.view === 'catalogo') {
+                    event.stopPropagation()
+                    setEmpresasOpen(false)
+                    setCatalogoOpen((prev) => !prev)
                   } else {
                     setEmpresasOpen(false)
+                    setCatalogoOpen(false)
                     onNavigate(item.view)
                   }
                 }}
@@ -281,6 +303,236 @@ export function ResumenSubNav({ activeView, onNavigate }: ResumenSubNavProps) {
               }}
             >
               Ver todos los accesos &rarr;
+            </button>
+          </div>
+        </div>
+      )}
+
+      {catalogoOpen && (
+        <div className="resumen-mega" ref={dropdownRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+          {/* Column 1: Performance */}
+          <div className="resumen-mega__col">
+            <div className="resumen-mega__head">
+              <CircleDot size={14} className="resumen-mega__head-icon" />
+              DESEMPEÑO Y RINES
+            </div>
+            <ul className="resumen-mega__units" style={{ marginTop: '8px', display: 'grid', gap: '8px' }}>
+              <li>
+                <button
+                  type="button"
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    margin: 0,
+                    color: 'inherit',
+                    font: 'inherit',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    width: '100%',
+                  }}
+                  onClick={() => {
+                    setCatalogoOpen(false)
+                    onNavigate('catalogo', 'Rines')
+                  }}
+                >
+                  <CircleDot size={16} className="resumen-mega__row-icon" />
+                  <div className="resumen-mega__row-copy">
+                    <strong>Rines</strong>
+                    <span>Rines de alto rendimiento</span>
+                  </div>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    margin: 0,
+                    color: 'inherit',
+                    font: 'inherit',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    width: '100%',
+                  }}
+                  onClick={() => {
+                    setCatalogoOpen(false)
+                    onNavigate('catalogo', 'Suspensión')
+                  }}
+                >
+                  <Layers size={16} className="resumen-mega__row-icon" />
+                  <div className="resumen-mega__row-copy">
+                    <strong>Suspensión</strong>
+                    <span>Sistemas y amortiguación</span>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 2: Lighting & Spacers */}
+          <div className="resumen-mega__col">
+            <div className="resumen-mega__head">
+              <Lightbulb size={14} className="resumen-mega__head-icon" />
+              ILUMINACIÓN Y SEPARADORES
+            </div>
+            <ul className="resumen-mega__units" style={{ marginTop: '8px', display: 'grid', gap: '8px' }}>
+              <li>
+                <button
+                  type="button"
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    margin: 0,
+                    color: 'inherit',
+                    font: 'inherit',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    width: '100%',
+                  }}
+                  onClick={() => {
+                    setCatalogoOpen(false)
+                    onNavigate('catalogo', 'Iluminación')
+                  }}
+                >
+                  <Lightbulb size={16} className="resumen-mega__row-icon" />
+                  <div className="resumen-mega__row-copy">
+                    <strong>Iluminación</strong>
+                    <span>Luces y sistemas LED</span>
+                  </div>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    margin: 0,
+                    color: 'inherit',
+                    font: 'inherit',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    width: '100%',
+                  }}
+                  onClick={() => {
+                    setCatalogoOpen(false)
+                    onNavigate('catalogo', 'Espaciadores')
+                  }}
+                >
+                  <Circle size={16} className="resumen-mega__row-icon" />
+                  <div className="resumen-mega__row-copy">
+                    <strong>Espaciadores</strong>
+                    <span>Separadores de rueda</span>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Accessories & Tools */}
+          <div className="resumen-mega__col">
+            <div className="resumen-mega__head">
+              <Package size={14} className="resumen-mega__head-icon" />
+              ACCESORIOS Y HERRAMIENTAS
+            </div>
+            <ul className="resumen-mega__units" style={{ marginTop: '8px', display: 'grid', gap: '8px' }}>
+              <li>
+                <button
+                  type="button"
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    margin: 0,
+                    color: 'inherit',
+                    font: 'inherit',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    width: '100%',
+                  }}
+                  onClick={() => {
+                    setCatalogoOpen(false)
+                    onNavigate('catalogo', 'Accesorios')
+                  }}
+                >
+                  <Package size={16} className="resumen-mega__row-icon" />
+                  <div className="resumen-mega__row-copy">
+                    <strong>Accesorios</strong>
+                    <span>Accesorios y adicionales</span>
+                  </div>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    margin: 0,
+                    color: 'inherit',
+                    font: 'inherit',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    width: '100%',
+                  }}
+                  onClick={() => {
+                    setCatalogoOpen(false)
+                    onNavigate('catalogo', 'Herramientas')
+                  }}
+                >
+                  <Wrench size={16} className="resumen-mega__row-icon" />
+                  <div className="resumen-mega__row-copy">
+                    <strong>Herramientas</strong>
+                    <span>Herramientas especializadas</span>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Full Catalog */}
+          <div className="resumen-mega__col">
+            <div className="resumen-mega__head">
+              <BookOpen size={14} className="resumen-mega__head-icon" />
+              CATÁLOGO COMPLETO
+            </div>
+            <div style={{ marginTop: '8px', display: 'grid', gap: '4px' }}>
+              <h4 className="resumen-mega__title">Explorar Todo</h4>
+              <p className="resumen-mega__desc">Ver todas las categorías y marcas del catálogo</p>
+            </div>
+            <button
+              type="button"
+              className="resumen-mega__link"
+              onClick={() => {
+                setCatalogoOpen(false)
+                onNavigate('catalogo')
+              }}
+            >
+              Ver catálogo completo &rarr;
             </button>
           </div>
         </div>

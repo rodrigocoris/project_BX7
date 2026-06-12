@@ -64,28 +64,57 @@ function CatalogImage({ src, alt, className }: { src: string; alt: string; class
   )
 }
 
-export function CatalogView() {
+interface CatalogViewProps {
+  categoryFilter?: string
+  setCategoryFilter?: (val: string) => void
+}
+
+export function CatalogView({
+  categoryFilter: propCategoryFilter,
+  setCategoryFilter: propSetCategoryFilter,
+}: CatalogViewProps = {}) {
   const [search, setSearch] = useState('')
 
-  const [categoryFilter, setCategoryFilter] = useState<string>(
+  const [localCategoryFilter, setLocalCategoryFilter] = useState<string>(
     catalogCategoryFilterOptions[0]
   )
   
+  const categoryFilter = propCategoryFilter ?? localCategoryFilter
+  const setCategoryFilter = propSetCategoryFilter ?? setLocalCategoryFilter
+
   const [brandFilter, setBrandFilter] = useState<string>(
     catalogBrandFilterOptions[0]
   )
 
   const filteredProducts = useMemo(() => {
-    const query = search.trim().toLowerCase()
-    if (!query) return catalogPopularProducts
+    let list = [...catalogPopularProducts]
 
-    return catalogPopularProducts.filter(
+    if (categoryFilter && categoryFilter !== 'Todas las categorías') {
+      list = list.filter((p) => p.category.toLowerCase() === categoryFilter.toLowerCase())
+    }
+
+    if (brandFilter && brandFilter !== 'Todas las marcas') {
+      const brandLower = brandFilter.toLowerCase()
+      list = list.filter((p) => {
+        const nameLower = p.name.toLowerCase()
+        const skuLower = p.sku.toLowerCase()
+        if (brandLower === 'kc hilites') {
+          return nameLower.includes('kc') || skuLower.includes('kc')
+        }
+        return nameLower.includes(brandLower) || skuLower.includes(brandLower)
+      })
+    }
+
+    const query = search.trim().toLowerCase()
+    if (!query) return list
+
+    return list.filter(
       (product) =>
         product.name.toLowerCase().includes(query) ||
         product.sku.toLowerCase().includes(query) ||
         product.category.toLowerCase().includes(query),
     )
-  }, [search])
+  }, [search, categoryFilter, brandFilter])
 
   return (
     <section className="catalog-view dashboard-view" id="catalogo">
@@ -155,7 +184,12 @@ export function CatalogView() {
             const Icon = categoryIcons[category.icon]
 
             return (
-              <article key={category.id} className="catalog-cat-card">
+              <article
+                key={category.id}
+                className="catalog-cat-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setCategoryFilter(category.name)}
+              >
                 <div className="catalog-cat-card__media">
                   <CatalogImage src={category.image} alt={category.name} className="catalog-cat-card__img" />
                 </div>

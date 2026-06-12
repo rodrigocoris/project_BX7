@@ -86,6 +86,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<DashboardView>(
     () => viewFromHash(window.location.hash) ?? 'resumen',
   )
+  const [catalogCategoryFilter, setCatalogCategoryFilter] = useState<string>('Todas las categorías')
   const [sidebarOpen, setSidebarOpen] = useState(() => window.matchMedia('(min-width: 1201px)').matches)
   const dashboardHeaderRef = useRef<HTMLDivElement>(null)
 
@@ -326,7 +327,10 @@ export default function App() {
     return product.stock <= product.minStock ? 'stock-critical' : ''
   }
 
-  function handleNavigate(view: DashboardView) {
+  function handleNavigate(view: DashboardView, category?: string) {
+    if (view === 'catalogo') {
+      setCatalogCategoryFilter(category || 'Todas las categorías')
+    }
     setActiveView(view)
     try {
       window.history.replaceState(null, '', hashFromView(view))
@@ -639,7 +643,12 @@ export default function App() {
           </section>
         ) : null}
 
-        {activeView === 'catalogo' ? <CatalogView /> : null}
+        {activeView === 'catalogo' ? (
+          <CatalogView
+            categoryFilter={catalogCategoryFilter}
+            setCategoryFilter={setCatalogCategoryFilter}
+          />
+        ) : null}
 
         {activeView === 'inventario' ? (
           <section className="content-stack dashboard-view" id="inventario">
