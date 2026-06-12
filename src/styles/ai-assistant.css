@@ -72,7 +72,7 @@
 .ai-panel {
   position: fixed;
   bottom: 28px;
-  right: 140px;
+  right: 24px;
   z-index: 9000;
   width: 360px;
   max-width: calc(100vw - 160px);
