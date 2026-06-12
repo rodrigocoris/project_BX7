@@ -190,8 +190,29 @@ export function CatalogView({
                 style={{ cursor: 'pointer' }}
                 onClick={() => setCategoryFilter(category.name)}
               >
-                <div className="catalog-cat-card__media">
-                  <CatalogImage src={category.image} alt={category.name} className="catalog-cat-card__img" />
+                <div className="catalog-cat-card__media" style={{ background: 'linear-gradient(135deg, #151515, #0a0a0a)', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{
+                    position: 'absolute',
+                    width: '80px',
+                    height: '80px',
+                    background: 'radial-gradient(circle, rgba(255, 90, 31, 0.16) 0%, rgba(255, 176, 0, 0) 70%)',
+                    borderRadius: '50%',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    filter: 'blur(6px)',
+                  }} />
+                  <Icon
+                    size={44}
+                    strokeWidth={1.5}
+                    className="catalog-cat-card__huge-icon"
+                    style={{
+                      color: '#ff5a1f',
+                      filter: 'drop-shadow(0 4px 10px rgba(255, 90, 31, 0.45))',
+                      transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease, filter 0.3s ease',
+                      zIndex: 2,
+                    }}
+                  />
                 </div>
                 <div className="catalog-cat-card__body">
                   <div className="catalog-cat-card__label">

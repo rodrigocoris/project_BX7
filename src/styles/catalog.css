@@ -232,6 +232,12 @@
   transform: translateY(-2px);
 }
 
+.catalog-cat-card:hover .catalog-cat-card__huge-icon {
+  transform: scale(1.15);
+  color: #ffb000 !important;
+  filter: drop-shadow(0 6px 16px rgba(255, 176, 0, 0.65)) !important;
+}
+
 .catalog-cat-card__media {
   height: 152px;
   background: #0a0a0a;
